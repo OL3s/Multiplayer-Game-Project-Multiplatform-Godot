@@ -10,9 +10,9 @@
 layout_mode = 3
 anchors_preset = 0
 offset_left = 97.0
-offset_top = 199.0
+offset_top = 177.0
 offset_right = 691.0
-offset_bottom = 463.0
+offset_bottom = 441.0
 
 [node name="Cont-Players" type="HFlowContainer" parent="Ctrl-Players" unique_id=2086512070]
 layout_mode = 1

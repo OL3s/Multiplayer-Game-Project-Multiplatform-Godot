@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b02nwg6h5cyum"
-path="res://.godot/imported/sp-config-phone.png-c4bf0042d68e5d6ca80901a3a4611fcd.ctex"
+uid="uid://qcsbrene1kjv"
+path="res://.godot/imported/sp-config-pc.png-4597935ded64bece38a3b0e9b0ccadba.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/icons/icons/sp-config-phone.png"
-dest_files=["res://.godot/imported/sp-config-phone.png-c4bf0042d68e5d6ca80901a3a4611fcd.ctex"]
+source_file="res://sprites/icons/sp-config-pc.png"
+dest_files=["res://.godot/imported/sp-config-pc.png-4597935ded64bece38a3b0e9b0ccadba.ctex"]
 
 [params]
 

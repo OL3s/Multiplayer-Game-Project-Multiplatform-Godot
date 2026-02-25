@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://c2f22qm5sqlv7"]
 
 [ext_resource type="Script" uid="uid://dmc3gvxhsf622" path="res://scenes/lobby/tscn/CtrlPlayer.cs" id="1_4fbcg"]
-[ext_resource type="Texture2D" uid="uid://b1nb8hiefrsvs" path="res://sprites/icons/icons/sp-ready-false.png" id="1_jh458"]
+[ext_resource type="Texture2D" uid="uid://b1nb8hiefrsvs" path="res://sprites/icons/sp-ready-false.png" id="1_jh458"]
 
 [node name="Ctrl-Player" type="Control" unique_id=1004987843]
 custom_minimum_size = Vector2(128, 128)
