@@ -153,3 +153,8 @@
   - prediction kun for “feel”, aldri truth
 
 ---
+
+## Gamerules
+
+- Begrenset antall respawns for høyere skillcealing
+- Mange forskjellige gamemodes, noen med 1 liv, noen med flere
