@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://blust82uglpgk"]
+
+[node name="Ctrl-Config" type="Control" unique_id=861080077]
+custom_minimum_size = Vector2(200, 500)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 200.0
+offset_bottom = 500.0
+
+[node name="Panel" type="Panel" parent="." unique_id=261720191]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2

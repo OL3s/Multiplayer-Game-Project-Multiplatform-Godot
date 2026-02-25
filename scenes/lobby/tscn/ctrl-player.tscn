@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://c2f22qm5sqlv7"]
+
+[ext_resource type="Script" uid="uid://dmc3gvxhsf622" path="res://scenes/lobby/tscn/CtrlPlayer.cs" id="1_4fbcg"]
+[ext_resource type="Texture2D" uid="uid://b1nb8hiefrsvs" path="res://sprites/icons/lobby/sp-ready2.png" id="1_jh458"]
+
+[node name="Ctrl-Player" type="Control" unique_id=1004987843]
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_4fbcg")
+
+[node name="Img-Ready" type="TextureRect" parent="." unique_id=1694487137]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -32.0
+offset_top = -32.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(4, 4)
+texture = ExtResource("1_jh458")

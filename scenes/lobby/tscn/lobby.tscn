@@ -1,0 +1,56 @@
+[gd_scene format=3 uid="uid://b3k7l5oi2km2c"]
+
+[ext_resource type="PackedScene" uid="uid://c2f22qm5sqlv7" path="res://scenes/lobby/tscn/ctrl-player.tscn" id="1_1ig7j"]
+[ext_resource type="Script" uid="uid://dv6mvtoaxhdh" path="res://scenes/lobby/tscn/ContPlayers.cs" id="1_ukx7c"]
+[ext_resource type="PackedScene" uid="uid://blust82uglpgk" path="res://scenes/lobby/tscn/ctrl-config.tscn" id="3_mlusu"]
+
+[node name="Lobby" type="Node2D" unique_id=1925478892]
+
+[node name="Ctrl-Players" type="Control" parent="." unique_id=268936926]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 97.0
+offset_top = 199.0
+offset_right = 691.0
+offset_bottom = 463.0
+
+[node name="Cont-Players" type="HFlowContainer" parent="Ctrl-Players" unique_id=2086512070]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+reverse_fill = true
+script = ExtResource("1_ukx7c")
+metadata/_edit_lock_ = true
+
+[node name="Ctrl-Player" parent="Ctrl-Players/Cont-Players" unique_id=1004987843 instance=ExtResource("1_1ig7j")]
+layout_mode = 2
+
+[node name="Ctrl-Player2" parent="Ctrl-Players/Cont-Players" unique_id=1245882720 instance=ExtResource("1_1ig7j")]
+layout_mode = 2
+
+[node name="Ctrl-Player3" parent="Ctrl-Players/Cont-Players" unique_id=847153161 instance=ExtResource("1_1ig7j")]
+layout_mode = 2
+
+[node name="Ctrl-Player4" parent="Ctrl-Players/Cont-Players" unique_id=1209928514 instance=ExtResource("1_1ig7j")]
+layout_mode = 2
+
+[node name="Ctrl-Player5" parent="Ctrl-Players/Cont-Players" unique_id=688476036 instance=ExtResource("1_1ig7j")]
+layout_mode = 2
+
+[node name="Ctrl-Player6" parent="Ctrl-Players/Cont-Players" unique_id=1725561064 instance=ExtResource("1_1ig7j")]
+layout_mode = 2
+
+[node name="Ctrl-Player7" parent="Ctrl-Players/Cont-Players" unique_id=698056297 instance=ExtResource("1_1ig7j")]
+layout_mode = 2
+
+[node name="Ctrl-Player8" parent="Ctrl-Players/Cont-Players" unique_id=513056177 instance=ExtResource("1_1ig7j")]
+layout_mode = 2
+
+[node name="Ctrl-Config" parent="." unique_id=861080077 instance=ExtResource("3_mlusu")]
+offset_left = 822.0
+offset_top = 64.0
+offset_right = 1022.0
+offset_bottom = 564.0
