@@ -3,7 +3,7 @@ Fast-paced 2–8 player 2D PvP arena with fully destructible environment.
 Built in Godot with C#.
 
 ## Tech
-- Godot 4.6.stable.official (Mono)
+- Godot Engine v4.6.1.stable.mono.official.14d19694e (Mono)
 - .NET 10
 - C#
 - Netcoding -> WebRTC
