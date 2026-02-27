@@ -4,30 +4,53 @@ using System.Collections.Generic;
 
 public partial class ContPlayers : HFlowContainer
 {
-	private readonly List<StatPlayerLobby> playerList = new();
+	private readonly List<playerData> playerList = new();
 
 	public override void _Ready()
 	{
-		UpdateVisibility();
+		// MOCK DATA
+		playerList.Add(new playerData());
+		playerList.Add(new playerData());
+		UpdatePlayersAll();
 	}
 
-	public void UpdateVisibility()
+public void UpdatePlayersAll()
+{
+	var children = GetChildren();
+	int slotIndex = 0;
+
+	for (int i = 0; i < children.Count; i++)
 	{
-		var children = GetChildren();
+		if (children[i] is not CtrlPlayer slot)
+			continue;
 
-		for (int i = 0; i < children.Count; i++)
+		bool hasPlayer = slotIndex < playerList.Count;
+		slot.Visible = hasPlayer;
+
+		if (hasPlayer)
 		{
-			if (children[i] is not Control slot)
-				continue;
-
-			// Show slot only if we have player data for it
-			slot.Visible = i < playerList.Count;
+			var plData = playerList[slotIndex];
+			slot.NameLabel.Text = plData.Name;
+			slot.SetReady(plData.IsReady);
 		}
-	}
 
-	public struct StatPlayerLobby
+		slotIndex++;
+	}
+}
+
+	private struct playerData
 	{
 		public bool IsReady;
 		public string Name;
+		
+		public playerData(bool isReady, string name) {
+			IsReady = isReady;
+			Name = name;
+		}
+		
+		public playerData() {
+			IsReady = false;
+			Name = "noname";
+		}
 	}
 }

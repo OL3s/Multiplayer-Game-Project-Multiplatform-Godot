@@ -2,14 +2,54 @@
 
 [ext_resource type="Script" uid="uid://dmc3gvxhsf622" path="res://scenes/lobby/tscn/CtrlPlayer.cs" id="1_4fbcg"]
 [ext_resource type="Texture2D" uid="uid://b1nb8hiefrsvs" path="res://sprites/icons/sp-ready-false.png" id="1_jh458"]
+[ext_resource type="Texture2D" uid="uid://bdku30d1il5wb" path="res://sprites/game/sp-player.png" id="3_8cynb"]
 
-[node name="Ctrl-Player" type="Control" unique_id=1004987843]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8cynb"]
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="Ctrl-Player" type="Control" unique_id=1004987843 node_paths=PackedStringArray("ReadyTexture", "AvatarTexture", "NameLabel")]
 custom_minimum_size = Vector2(128, 128)
 layout_mode = 3
 anchors_preset = 0
+offset_right = 128.0
+offset_bottom = 128.0
 script = ExtResource("1_4fbcg")
+ReadyTexture = NodePath("Tex-Ready")
+AvatarTexture = NodePath("Tex-Avatar")
+NameLabel = NodePath("Label")
 
-[node name="Img-Ready" type="TextureRect" parent="." unique_id=1694487137]
+[node name="Panel" type="Panel" parent="." unique_id=122679414]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_8cynb")
+
+[node name="Tex-Ready" type="TextureRect" parent="." unique_id=1694487137]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -32.0
+offset_right = -16.0
+offset_bottom = 16.0
+grow_horizontal = 0
+scale = Vector2(2, 2)
+texture = ExtResource("1_jh458")
+
+[node name="Label" type="Label" parent="." unique_id=1236298631]
+layout_mode = 1
+offset_right = 89.0
+offset_bottom = 23.0
+text = "$Username"
+
+[node name="Tex-Avatar" type="TextureRect" parent="." unique_id=1632371624]
+custom_minimum_size = Vector2(32, 32)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -18,9 +58,7 @@ anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -32.0
 offset_top = -32.0
-offset_right = -16.0
-offset_bottom = -16.0
 grow_horizontal = 2
 grow_vertical = 2
-scale = Vector2(4, 4)
-texture = ExtResource("1_jh458")
+scale = Vector2(2, 2)
+texture = ExtResource("3_8cynb")

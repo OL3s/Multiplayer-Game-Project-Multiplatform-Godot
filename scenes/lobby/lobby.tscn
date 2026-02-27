@@ -11,7 +11,7 @@ layout_mode = 3
 anchors_preset = 0
 offset_left = 97.0
 offset_top = 177.0
-offset_right = 691.0
+offset_right = 634.0
 offset_bottom = 441.0
 
 [node name="Cont-Players" type="HFlowContainer" parent="Ctrl-Players" unique_id=2086512070]
@@ -25,7 +25,7 @@ reverse_fill = true
 script = ExtResource("1_ukx7c")
 metadata/_edit_lock_ = true
 
-[node name="Ctrl-Player" parent="Ctrl-Players/Cont-Players" unique_id=1004987843 instance=ExtResource("1_1ig7j")]
+[node name="Ctrl-Player1" parent="Ctrl-Players/Cont-Players" unique_id=1004987843 instance=ExtResource("1_1ig7j")]
 layout_mode = 2
 
 [node name="Ctrl-Player2" parent="Ctrl-Players/Cont-Players" unique_id=1245882720 instance=ExtResource("1_1ig7j")]

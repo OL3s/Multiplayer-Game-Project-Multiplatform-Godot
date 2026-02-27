@@ -22,15 +22,15 @@ Built in Godot with C#.
 - Server syncs: state / destruction / hits  
 - Dedicated server supported
 - Crossplay on most platforms
-    - Android
-    - HTML5
-    - Windows
-    - Linux
-    - Others come later:
-        - iOS
-        - MacOS
-        - Xbox
-        - Playstation
+	- Android
+	- HTML5
+	- Windows
+	- Linux
+	- Others come later:
+		- iOS
+		- MacOS
+		- Xbox
+		- Playstation
 
 ## Requirements
 - Godot 4.6 Mono
