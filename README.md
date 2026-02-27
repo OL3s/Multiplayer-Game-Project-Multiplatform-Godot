@@ -6,6 +6,7 @@ Built in Godot with C#.
 - Godot 4.6.stable.official (Mono)
 - .NET 10
 - C#
+- Netcoding -> WebRTC
 
 ![Structure](./documentation/godot-runtime-diagram.png)
 
