@@ -41,6 +41,24 @@ Built in Godot with C#.
 2. Open project in Godot 4.6 Mono  
 3. Run project  
 
+# Database
+- MySQL
+
+## Bash commands (bash) -
+### Executions
+sudo systemctl start mysql 
+sudo systemctl stop mysql
+sudo systemctl restart mysql
+sudo systemctl status mysql
+
+### Auto-start boot
+sudo systemctl enable mysql
+sudo systemctl disable mysql
+
+### Other info
+OS → systemd → mysql service → DB server
+mysql -u gameuser -p
+
 ## Export
 Godot → Export → choose platform
 
