@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://btfeehoq6t3w6"]
+
+[ext_resource type="Texture2D" uid="uid://d3otjehv5wf2k" path="res://sprites/game/sp-Tileset-green.png" id="1_cds2x"]
+[ext_resource type="Script" uid="uid://bfi0vxy4cxjew" path="res://scenes/map/TileMapFloor.cs" id="2_j7ynj"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_p6ks0"]
+texture = ExtResource("1_cds2x")
+texture_region_size = Vector2i(8, 8)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+2:1/0 = 0
+2:2/0 = 0
+1:2/0 = 0
+0:2/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_fnkui"]
+tile_size = Vector2i(8, 8)
+sources/0 = SubResource("TileSetAtlasSource_p6ks0")
+
+[node name="TileMapFloor" type="TileMapLayer" unique_id=1976063207]
+tile_set = SubResource("TileSet_fnkui")
+script = ExtResource("2_j7ynj")

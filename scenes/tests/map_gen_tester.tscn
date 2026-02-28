@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://cf7g6f421bgqf"]
+
+[ext_resource type="PackedScene" uid="uid://btfeehoq6t3w6" path="res://scenes/map/tile_map_floor.tscn" id="2_8dnmp"]
+
+[sub_resource type="CSharpScript" id="CSharpScript_yqlhc"]
+script/source = "using Godot;
+using System;
+using System.Collections.Generic;
+using Mapgen;
+
+public partial class MapGenTester : Node2D
+{
+	private MapgenData data;
+
+	public override void _Ready()
+	{
+		data = Generator.GenerateMap(1);
+	}
+}
+"
+
+[node name="MapGenTester" type="Node2D" unique_id=1320904665]
+script = SubResource("CSharpScript_yqlhc")
+
+[node name="TileMapFloor" parent="." unique_id=1976063207 instance=ExtResource("2_8dnmp")]

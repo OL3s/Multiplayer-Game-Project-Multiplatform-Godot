@@ -8,6 +8,7 @@ public partial class CtrlPlayer : Control {
 	[Export] public TextureRect ReadyTexture;
 	[Export] public TextureRect AvatarTexture;
 	[Export] public Label NameLabel;
+	[Export] public Panel BorderPanel;
 	
 	public override void _Ready() {
 		

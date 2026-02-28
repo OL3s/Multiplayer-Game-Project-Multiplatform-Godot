@@ -10,7 +10,7 @@ corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
-[node name="Ctrl-Player" type="Control" unique_id=1004987843 node_paths=PackedStringArray("ReadyTexture", "AvatarTexture", "NameLabel")]
+[node name="Ctrl-Player" type="Control" unique_id=1004987843 node_paths=PackedStringArray("ReadyTexture", "AvatarTexture", "NameLabel", "BorderPanel")]
 custom_minimum_size = Vector2(128, 128)
 layout_mode = 3
 anchors_preset = 0
@@ -20,6 +20,7 @@ script = ExtResource("1_4fbcg")
 ReadyTexture = NodePath("Tex-Ready")
 AvatarTexture = NodePath("Tex-Avatar")
 NameLabel = NodePath("Label")
+BorderPanel = NodePath("Panel")
 
 [node name="Panel" type="Panel" parent="." unique_id=122679414]
 layout_mode = 1
