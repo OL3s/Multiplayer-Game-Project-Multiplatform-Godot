@@ -13,7 +13,7 @@ Built in Godot with C#.
 <details>
 <summary>PlantUML source</summary>
 
-`
+```
 @startuml
 left to right direction
 skinparam monochrome true
@@ -63,7 +63,7 @@ LobbyC <.> LobbyS : WebRTC
 GameC <.> GameS : WebRTC
 
 @enduml
-`
+```
 </details>
 
 ## Core Gameplay
