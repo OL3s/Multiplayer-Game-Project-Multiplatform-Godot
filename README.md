@@ -10,6 +10,62 @@ Built in Godot with C#.
 
 ![Structure](./documentation/godot-runtime-diagram.png)
 
+<details>
+<summary>PlantUML source</summary>
+
+`
+@startuml
+left to right direction
+skinparam monochrome true
+skinparam shadowing false
+skinparam linetype ortho
+skinparam usecaseBorderThickness 2
+skinparam rectangleBorderThickness 2
+
+database "MySQL" as DB
+
+rectangle "HTTP Service" as HTTP {
+  usecase "Matchmaker" as Matchmaker
+  usecase "Login" as LoginS
+}
+
+rectangle "Godot Runtime (same codebase)" {
+
+  rectangle "Client (n instances)" {
+	usecase "Login" as LoginC
+	usecase "Menu" as Menu
+	usecase "Lobby" as LobbyC
+	usecase "Game" as GameC
+
+	LoginC <-> LoginS
+	LoginC ..> Menu
+	Menu ..> LobbyC
+	LobbyC ..> GameC
+  }
+
+  rectangle "Server (autonomy)" {
+	usecase "Lobby" as LobbyS
+	usecase "Game" as GameS
+
+	LobbyS --> GameS
+  }
+}
+
+' HTTP flows
+Menu --> Matchmaker
+LoginS <--> DB
+
+' Match assignment
+Matchmaker --> LobbyS : Docker execute
+
+' Netcoding (WebRTC)
+LobbyC <.> LobbyS : WebRTC
+GameC <.> GameS : WebRTC
+
+@enduml
+`
+</details>
+
 ## Core Gameplay
 - 2–8 players
 - 2D PvP arena combat

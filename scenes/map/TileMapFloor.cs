@@ -18,7 +18,7 @@ public partial class TileMapFloor : TileMapLayer
 		var rng = new RandomNumberGenerator();
 		ulong seed = rng.Randi();   // full 64-bit
 
-		data = MapgenData.GenerateMap(seed);
+		data = MapgenData.GenerateMap(seed, 200);
 
 		foreach (var p in data.TileFloor)
 		{

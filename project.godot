@@ -11,8 +11,13 @@ config_version=5
 [application]
 
 config/name="GodotMultiplayerProject"
+run/main_scene="uid://c0acu6ebk5l4r"
 config/features=PackedStringArray("4.6", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
+
+[autoload]
+
+NetworkService="*uid://d33visbn1y2t5"
 
 [dotnet]
 

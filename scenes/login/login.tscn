@@ -1,3 +1,22 @@
 [gd_scene format=3 uid="uid://c0acu6ebk5l4r"]
 
+[ext_resource type="Script" uid="uid://bjf74ui6y4vuf" path="res://scenes/login/ButtonLogin.cs" id="1_d7qrr"]
+
 [node name="Login" type="Node2D" unique_id=307921326]
+
+[node name="Button" type="Button" parent="." unique_id=1349235372]
+offset_left = 392.0
+offset_top = 405.0
+offset_right = 807.0
+offset_bottom = 516.0
+text = "Continue"
+script = ExtResource("1_d7qrr")
+
+[node name="Label" type="Label" parent="." unique_id=215349452]
+offset_left = 378.0
+offset_top = 208.0
+offset_right = 821.0
+offset_bottom = 306.0
+text = "Login (To be implemented)"
+horizontal_alignment = 1
+vertical_alignment = 1

@@ -14,8 +14,7 @@ namespace Mapgen
 			Path = new List<Vector2I>();
 		}
 
-		// --- moved from Generator ---
-		public static MapgenData GenerateMap(ulong seed)
+		public static MapgenData GenerateMap(ulong seed, int length = 50)
 		{
 			var rng = new RandomNumberGenerator { Seed = seed };
 
@@ -23,7 +22,7 @@ namespace Mapgen
 
 			Vector2I pos = Vector2I.Zero;
 			AddTile(data, pos);
-			ApplySnake(ref pos, 50, data, rng);
+			ApplySnake(ref pos, length, data, rng);
 			data.MoveToPositive();
 
 			GD.Print("Map Generated : " + data.GetSize());
@@ -60,7 +59,6 @@ namespace Mapgen
 			}
 		}
 
-		// --- your existing methods unchanged ---
 		public Vector2I GetTopLeft()
 		{
 			if (TileFloor.Count == 0)
