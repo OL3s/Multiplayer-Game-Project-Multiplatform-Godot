@@ -95,6 +95,8 @@ namespace Mapgen
 			return new Vector2I(maxX, maxY);
 		}
 
+		/// <summary>Shifts all tiles and path so the map is in positive coordinates.</summary>
+		/// <returns>Offset applied to all positions. Zero if already positive.</returns>
 		public Vector2I MoveToPositive()
 		{
 			if (TileFloor.Count == 0)
