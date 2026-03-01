@@ -1,21 +1,23 @@
 using Godot;
 using System;
+using Shared;
 using System.Collections.Generic;
+using System.Linq;
 
 public partial class ContPlayers : HFlowContainer
 {
-	private readonly List<playerData> playerList = new();
 
 	public override void _Ready()
 	{
-		// MOCK DATA
-		playerList.Add(new playerData());
-		playerList.Add(new playerData(true, "yayeet", 1));
 		UpdatePlayersAll();
+		var networkService = GetNode<NetworkService>("/root/NetworkService");
+		networkService.PeersUpdated += UpdatePlayersAll; // subscribe to player list updates
 	}
 
 	public void UpdatePlayersAll()
 	{
+		var networkService = GetNode<NetworkService>("/root/NetworkService");
+		var playerList = networkService.Peers.Values.ToList();
 		var children = GetChildren();
 		int slotIndex = 0;
 
@@ -31,30 +33,11 @@ public partial class ContPlayers : HFlowContainer
 			{
 				var plData = playerList[slotIndex];
 				slot.NameLabel.Text = plData.Name;
-				slot.SetReady(plData.IsReady);
+				slot.SetReady(plData.Ready);
 				slot.BorderPanel.Modulate = TeamColor(plData.TeamId);
 			}
 
 			slotIndex++;
-		}
-	}
-
-	private struct playerData
-	{
-		public bool IsReady;
-		public string Name;
-		public int TeamId;
-		
-		public playerData(bool isReady, string name, int teamId) {
-			IsReady = isReady;
-			Name = name;
-			TeamId = teamId;
-		}
-		
-		public playerData() {
-			IsReady = false;
-			Name = "noname";
-			TeamId = 0;
 		}
 	}
 	

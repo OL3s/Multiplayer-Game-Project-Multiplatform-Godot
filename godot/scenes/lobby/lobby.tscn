@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://c2f22qm5sqlv7" path="res://scenes/lobby/tscn/ctrl-player.tscn" id="1_1ig7j"]
 [ext_resource type="Script" uid="uid://dv6mvtoaxhdh" path="res://scenes/lobby/tscn/ContPlayers.cs" id="1_ukx7c"]
 [ext_resource type="PackedScene" uid="uid://blust82uglpgk" path="res://scenes/lobby/tscn/ctrl-config.tscn" id="3_mlusu"]
+[ext_resource type="PackedScene" uid="uid://bw4kne3jntiun" path="res://scenes/ui/NetworkIcon.tscn" id="4_jekxk"]
 
 [node name="Lobby" type="Node2D" unique_id=1925478892]
 
@@ -54,3 +55,9 @@ offset_left = 822.0
 offset_top = 64.0
 offset_right = 1022.0
 offset_bottom = 564.0
+
+[node name="TextureRect" parent="." unique_id=184628440 instance=ExtResource("4_jekxk")]
+offset_left = 8.0
+offset_top = 7.0
+offset_right = 40.0
+offset_bottom = 39.0

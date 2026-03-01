@@ -3,6 +3,20 @@ using System.Collections.Generic;
 
 namespace Mapgen
 {
+	/// <summary>
+	/// Generates a random map as a set of floor tiles and a path connecting them.
+	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// The map is generated in a coordinate system where the starting tile is at (0,0)
+	/// and can extend in all directions. After generation, the map is shifted to positive
+	/// coordinates.
+	/// </para>
+	/// <para>
+	/// Calling a new MapgenData() creates an empty map. To generate a new random map,
+	/// call MapgenData.GenerateMap(seed).
+	/// </para>
+	/// </remarks>
 	public class MapgenData
 	{
 		public HashSet<Vector2I> TileFloor;
@@ -14,6 +28,14 @@ namespace Mapgen
 			Path = new List<Vector2I>();
 		}
 
+		/// <summary>
+		///  Generates a random map using a "drunkard's walk" algorithm. The path starts at (0,0) 
+		/// and takes random steps in the four cardinal directions until the desired length is reached. The path can cross
+		/// itself, creating loops and branches.
+		/// </summary>
+		/// <param name="seed">The seed for the random number generator.</param>
+		/// <param name="length">The desired length of the path.</param>
+		/// <returns>A MapgenData object containing the generated map.</returns>
 		public static MapgenData GenerateMap(ulong seed, int length = 50)
 		{
 			var rng = new RandomNumberGenerator { Seed = seed };

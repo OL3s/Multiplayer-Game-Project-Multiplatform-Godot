@@ -4,15 +4,17 @@ using System;
 namespace Shared {
 	public struct PlayerData
 	{
-		public bool IsReady;
+		public bool Ready;
 		public string Name;
 		public int TeamId;
 
-		public PlayerData(bool isReady, string name, int teamId)
+		public PlayerData(bool ready, string name, int teamId)
 		{
-			IsReady = isReady;
+			Ready = ready;
 			Name = name;
 			TeamId = teamId;
 		}
+
+		public PlayerData() : this(false, "Noname", 0) { }
 	}
 }

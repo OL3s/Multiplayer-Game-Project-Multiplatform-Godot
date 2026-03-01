@@ -1,3 +1,22 @@
 [gd_scene format=3 uid="uid://511e5mxjw6mi"]
 
+[ext_resource type="Script" uid="uid://but4rt1l8d3mw" path="res://scenes/menu/BtnJoin.cs" id="1_klgdb"]
+
 [node name="Menu" type="Node2D" unique_id=302091711]
+
+[node name="Button" type="Button" parent="." unique_id=1278372396]
+offset_left = 392.0
+offset_top = 405.0
+offset_right = 807.0
+offset_bottom = 516.0
+text = "Join Game"
+script = ExtResource("1_klgdb")
+
+[node name="Label" type="Label" parent="." unique_id=599322335]
+offset_left = 378.0
+offset_top = 208.0
+offset_right = 821.0
+offset_bottom = 306.0
+text = "Localhost"
+horizontal_alignment = 1
+vertical_alignment = 1
