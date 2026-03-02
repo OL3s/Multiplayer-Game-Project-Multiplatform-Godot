@@ -1,10 +1,10 @@
 using Godot;
 using System;
+using Shared;
 
 public partial class CtrlPlayer : Control {
 	
-	public string PlayerName { get; set; } = "?";
-	public bool IsReady { get; set; } = false;
+	public PlayerData PlayerData { get; set; } = new("Fetching...");
 	[Export] public TextureRect ReadyTexture;
 	[Export] public TextureRect AvatarTexture;
 	[Export] public Label NameLabel;
@@ -14,10 +14,10 @@ public partial class CtrlPlayer : Control {
 		
 	}
 	
-	public void SetReady(bool isReady)
+	public void SetReady(bool ready)
 	{
-		IsReady = isReady;
-		ReadyTexture.Texture = IsReady
+		PlayerData.Ready = ready;
+		ReadyTexture.Texture = PlayerData.Ready
 			? GD.Load<Texture2D>("res://sprites/icons/sp-ready-true.png")
 			: GD.Load<Texture2D>("res://sprites/icons/sp-ready-false.png");
 	}
