@@ -110,24 +110,6 @@ GameC <.> GameS : WebRTC
 # Database
 - MySQL
 
-## Bash commands (bash)
-### Executions
-- sudo systemctl start mysql 
-- sudo systemctl stop mysql
-- sudo systemctl restart mysql
-- sudo systemctl status mysql
-
-### Auto-start boot
-- sudo systemctl enable mysql
-- sudo systemctl disable mysql
-
-### Other info
-- OS → systemd → mysql service → DB server
-- mysql -u gameuser -p
-
-## Export
-Godot → Export → choose platform
-
 ## Status
 Prototype / early development
 
