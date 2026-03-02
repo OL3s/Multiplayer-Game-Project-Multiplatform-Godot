@@ -6,7 +6,7 @@ Built in Godot with C#.
 - Godot Engine v4.6.1.stable.mono.official.14d19694e (Mono)
 - .NET 10
 - C#
-- Netcoding -> WebRTC
+- Netcoding -> ENet
 
 ## Importent docs
 - **[Services](./documentation/Services.md)**
@@ -76,6 +76,11 @@ GameC <.> GameS : WebRTC
 - Fully destructible tilebased map
 - Round-based matches
 - Skill-based movement & aiming
+
+**Map illustration example:**
+<img width="992" height="541" alt="image" src="https://github.com/user-attachments/assets/fd0c4b7b-47fa-4cc9-a0c3-92ca383355df" />
+*This example is not that accurate, but to give an idea on what direction the maps may like.
+
 
 ## Multiplayer
 - Server-authoritative model  
