@@ -1,155 +1,197 @@
-using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Combat {
-	/// <summary>
-	/// Categories of damage that can be carried and combined in a <see cref="DamageContainer"/>.
-	/// </summary>
-	public enum DamageType {
-		Fire,
-		Poison,
-		Pierce,
-		Crush,
-		Slash,
-		Explosive
+    public enum DamageType {
+        Fire,
+        Poison,
+        Pierce,
+        Crush,
+        Explosive
+    }
+
+    /// <summary>
+    /// Base container for per-damage-type integer values.
+    /// DamageApply = raw damage values.
+    /// DamageArmor = % reduction values (0..100), clamped.
+    /// </summary>
+    public abstract class DamageContainer : Dictionary<DamageType, int> {
+        public DamageContainer() : base() { }
+
+        public DamageContainer(IDictionary<DamageType, int> dict)
+            : base(dict ?? throw new ArgumentNullException(nameof(dict))) { }
+
+        public DamageContainer(DamageType type, int value) : base() {
+            this[type] = value;
+        }
+
+        public DamageContainer(
+            int? fire = null,
+            int? poison = null,
+            int? pierce = null,
+            int? crush = null,
+            int? explosive = null
+        ) : base() {
+            if (fire.HasValue) this[DamageType.Fire] = fire.Value;
+            if (poison.HasValue) this[DamageType.Poison] = poison.Value;
+            if (pierce.HasValue) this[DamageType.Pierce] = pierce.Value;
+            if (crush.HasValue) this[DamageType.Crush] = crush.Value;
+            if (explosive.HasValue) this[DamageType.Explosive] = explosive.Value;
+        }
+
+        public int GetValue(DamageType type) => TryGetValue(type, out var v) ? v : 0;
+
+        public int TotalValue() => Values.Sum();
+
+        public override string ToString() {
+            return string.Join(", ", Keys.OrderBy(k => k).Select(k => $"{k}: {this[k]}"));
+        }
+
+        /// <summary>
+        /// True if no entries, or all values are 0.
+        /// </summary>
+        public bool IsEmpty() => Count == 0 || Values.All(v => v == 0);
+
+		// ---------- OPERATORS ----------
+		public static DamageContainer operator +(DamageContainer left, DamageContainer right) {
+			if (left == null) throw new ArgumentNullException(nameof(left));
+			if (right == null) throw new ArgumentNullException(nameof(right));
+
+			var result = new Dictionary<DamageType, int>(left);
+			foreach (var kvp in right) {
+				result[kvp.Key] = result.GetValueOrDefault(kvp.Key, 0) + kvp.Value;
+			}
+			return new DamageApply(result);
+		}
+		public static DamageContainer operator -(DamageContainer left, DamageContainer right) {
+			if (left == null) throw new ArgumentNullException(nameof(left));
+			if (right == null) throw new ArgumentNullException(nameof(right));
+			return left + (right * -1);
+		}
+
+		public static DamageContainer operator *(DamageContainer damage, float multiplier) {
+			if (damage == null) throw new ArgumentNullException(nameof(damage));
+			var result = new Dictionary<DamageType, int>();
+			foreach (var kvp in damage) {
+				result[kvp.Key] = (int)(kvp.Value * multiplier);
+			}
+			return new DamageApply(result);
+		}
+
+		public static DamageContainer operator *(float multiplier, DamageContainer damage) => damage * multiplier;
+		public static DamageContainer operator *(DamageContainer damage, int multiplier) => damage * (float)multiplier;
+		public static DamageContainer operator *(int multiplier, DamageContainer damage) => damage * multiplier;
+
+		public static DamageContainer operator /(DamageContainer damage, float divisor) {
+			if (damage == null) throw new ArgumentNullException(nameof(damage));
+			if (divisor == 0) throw new DivideByZeroException();
+			var result = new Dictionary<DamageType, int>();
+			foreach (var kvp in damage) {
+				result[kvp.Key] = (int)(kvp.Value / divisor);
+			}
+			return new DamageApply(result);
+		}
+		public static DamageContainer operator /(DamageContainer damage, int divisor) => damage / (float)divisor;
+
 	}
 
-	/// <summary>
-	/// A small value object that stores damage amounts per <see cref="DamageType"/>.
-	/// </summary>
-	/// <remarks>
-	/// Values are stored as integers and are typically interpreted as "raw" damage.
-	/// The container is mutable; methods like <see cref="AddDamage"/>, <see cref="ScaleDamage"/>,
-	/// and <see cref="Combine"/> mutate the instance.
-	/// </remarks>
-	public class DamageContainer {
-		private Dictionary<DamageType, int> damageValues;
 
-		/// <summary>
-		/// Creates a container backed by an existing dictionary.
-		/// </summary>
-		/// <remarks>
-		/// The provided dictionary instance is used directly (not copied). Mutating the returned
-		/// dictionary from <see cref="GetAllDamage"/> will mutate this container and vice-versa.
-		/// </remarks>
-		/// <param name="damageValues">Backing store for damage values.</param>
-		public DamageContainer(Dictionary<DamageType, int> damageValues) {
-			this.damageValues = damageValues;
-		}
+    /// <summary>
+    /// Raw damage numbers to apply.
+    /// </summary>
+    public class DamageApply : DamageContainer {
+        public DamageApply() : base() { }
+        public DamageApply(IDictionary<DamageType, int> dict) : base(dict) { }
+        public DamageApply(DamageType type, int value) : base(type, value) { }
+        public DamageApply(int? fire = null, int? poison = null, int? pierce = null, int? crush = null, int? explosive = null)
+            : base(fire, poison, pierce, crush, explosive) { }
 
-		/// <summary>
-		/// Creates a container with a single damage type.
-		/// </summary>
-		/// <param name="type">Damage type to set.</param>
-		/// <param name="value">Damage amount.</param>
-		public DamageContainer(DamageType type, int value) {
-			this.damageValues = new Dictionary<DamageType, int>();
-			this.damageValues[type] = value;
-		}
-
-		/// <summary>
-		/// Creates a container from optional values for each supported damage type.
-		/// </summary>
-		/// <remarks>
-		/// Any null parameter is omitted from the container.
-		/// </remarks>
-		public DamageContainer(int? fire, int? poison, int? pierce, int? crush, int? slash, int? explosive) {
-			this.damageValues = new Dictionary<DamageType, int>();
-			if (fire.HasValue) this.damageValues[DamageType.Fire] = fire.Value;
-			if (poison.HasValue) this.damageValues[DamageType.Poison] = poison.Value;
-			if (pierce.HasValue) this.damageValues[DamageType.Pierce] = pierce.Value;
-			if (crush.HasValue) this.damageValues[DamageType.Crush] = crush.Value;
-			if (slash.HasValue) this.damageValues[DamageType.Slash] = slash.Value;
-			if (explosive.HasValue) this.damageValues[DamageType.Explosive] = explosive.Value;
-		}
-
-		/// <summary>
-		/// Returns the damage value for a given type, or 0 if not present.
-		/// </summary>
-		public int GetDamage(DamageType type) {
-			return damageValues.ContainsKey(type) ? damageValues[type] : 0;
-		}
-
-		/// <summary>
-		/// Returns the underlying damage dictionary.
-		/// </summary>
-		/// <remarks>
-		/// This returns the internal dictionary by reference (not a copy).
-		/// External mutations will affect this container.
-		/// </remarks>
-		public Dictionary<DamageType, int> GetAllDamage() {
-			return damageValues;
-		}
-
-		/// <summary>
-		/// Adds damage of the given type, accumulating with any existing value.
-		/// </summary>
-		public void AddDamage(DamageType type, int value) {
-			if (damageValues.ContainsKey(type)) {
-				damageValues[type] += value;
-			} else {
-				damageValues[type] = value;
-			}
-		}
-
-		/// <summary>
-		/// Multiplies all stored values by <paramref name="multiplier"/>.
-		/// </summary>
-		/// <remarks>
-		/// Values are truncated toward zero when converted back to int.
-		/// </remarks>
-		public void ScaleDamage(float multiplier) {
-			foreach (var key in damageValues.Keys.ToList()) {
-				damageValues[key] = (int)(damageValues[key] * multiplier);
-			}
-		}
-
-		/// <summary>
-		/// Adds all damage values from <paramref name="other"/> into this container.
-		/// </summary>
-		public void Combine(DamageContainer other) {
-			foreach (var kv in other.GetAllDamage()) {
-				AddDamage(kv.Key, kv.Value);
-			}
-		}
-
-		/// <summary>
-		/// Returns the sum of all damage values.
-		/// </summary>
-		public int TotalDamage() {
-			return damageValues.Values.Sum();
-		}
-
-		/// <summary>
-		/// Removes all stored damage values.
-		/// </summary>
-		public void ClearDamage() {
-			damageValues.Clear();
-		}
-
-		/// <summary>
-		/// Returns true if the container has no entries.
-		/// </summary>
-		public bool IsEmpty() {
-			return damageValues.Count == 0;
-		}
-
-		/// <summary>
-		/// Returns true if the container stores a value for <paramref name="type"/>.
-		/// </summary>
-		public bool HasDamageType(DamageType type) {
-			return damageValues.ContainsKey(type);
-		}
-
-		/// <summary>
-		/// Returns a human-readable summary of the stored values.
-		/// </summary>
-		public override string ToString() {
-			return string.Join(", ", damageValues.Select(kv => $"{kv.Key}: {kv.Value}"));
-		}
-
-
+        public (bool isDead, int damageTaken) ApplyTo(CombatContainer target) {
+            if (target == null) throw new ArgumentNullException(nameof(target));
+            return target.ApplyDamage(this);
+        }
 	}
+
+    /// <summary>
+    /// Armor values are % reduction per type: 0 = no reduction, 100 = immune.
+    /// Values are clamped to [0,100].
+    /// </summary>
+    public class DamageArmor : DamageContainer {
+        // Clamp happens once here; every other constructor chains to this one.
+        public DamageArmor(IDictionary<DamageType, int> dict) : base(dict) {
+            ClampAllValues();
+        }
+
+        public DamageArmor() : this(new Dictionary<DamageType, int>()) { }
+
+        public DamageArmor(DamageType type, int value)
+            : this(new Dictionary<DamageType, int> { [type] = value }) { }
+
+        public DamageArmor(int? fire = null, int? poison = null, int? pierce = null, int? crush = null, int? explosive = null)
+            : this(BuildDict(fire, poison, pierce, crush, explosive)) { }
+
+        private static Dictionary<DamageType, int> BuildDict(
+            int? fire, int? poison, int? pierce, int? crush, int? explosive
+        ) {
+            var dict = new Dictionary<DamageType, int>();
+            if (fire.HasValue) dict[DamageType.Fire] = fire.Value;
+            if (poison.HasValue) dict[DamageType.Poison] = poison.Value;
+            if (pierce.HasValue) dict[DamageType.Pierce] = pierce.Value;
+            if (crush.HasValue) dict[DamageType.Crush] = crush.Value;
+            if (explosive.HasValue) dict[DamageType.Explosive] = explosive.Value;
+            return dict;
+        }
+
+        private void ClampAllValues() {
+            foreach (var key in Keys.ToList()) {
+                this[key] = Math.Clamp(this[key], 0, 100);
+            }
+        }
+    }
+
+    public static class DamageCalculator {
+        /// <summary>
+        /// Returns total damage after per-type armor mitigation.
+        /// final = raw * (100 - armor%) / 100
+        /// </summary>
+        public static int CalculateDamage(DamageApply baseDamage, DamageArmor targetArmor) {
+            if (baseDamage == null) throw new ArgumentNullException(nameof(baseDamage));
+            if (targetArmor == null) throw new ArgumentNullException(nameof(targetArmor));
+
+            int totalDamage = 0;
+
+            foreach (var damageType in Enum.GetValues<DamageType>()) {
+                int raw = baseDamage.GetValue(damageType);
+                int armorPercent = targetArmor.GetValue(damageType); // expected 0..100
+
+                int final = raw * (100 - armorPercent) / 100; // integer math (truncates)
+                totalDamage += final;
+            }
+
+            return totalDamage;
+        }
+    }
+
+    public class CombatContainer {
+        public int Health { get; set; }
+        public DamageArmor Armor { get; set; }
+
+        public CombatContainer(int health, DamageArmor armor) {
+            Health = health;
+            Armor = armor ?? new DamageArmor();
+        }
+
+        public CombatContainer() : this(100, new DamageArmor()) { }
+
+        public (bool isDead, int damageTaken) ApplyDamage(DamageApply damage) {
+            if (damage == null) throw new ArgumentNullException(nameof(damage));
+            Armor ??= new DamageArmor();
+
+            var finalDamage = DamageCalculator.CalculateDamage(damage, Armor);
+
+            Health = Math.Max(0, Health - finalDamage);
+            return (Health <= 0, finalDamage);
+        }
+    }
 }
