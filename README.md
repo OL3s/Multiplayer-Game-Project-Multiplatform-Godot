@@ -2,12 +2,12 @@
 Fast-paced 2–8 player 2D PvP arena with fully destructible environment.  
 Built in Godot with C#.
 
-## Tech
+## Tech/Requirements
 - ! Godot Engine v4.6.1.stable.mono.official.14d19694e (Mono)
 - ! .NET 10
 - C#
-- Netcoding -> ENet
-*"!" is requirements*
+
+Netcoding -> ENet
 
 ## Importent docs
 - **[Services](./documentation/Services.md)**
@@ -98,10 +98,6 @@ GameC <.> GameS : WebRTC
 		- MacOS
 		- Xbox
 		- Playstation
-
-## Requirements
-- Godot 4.6 Mono
-- .NET 10 SDK
 
 ## Run (Editor)
 1. Install .NET 10  
