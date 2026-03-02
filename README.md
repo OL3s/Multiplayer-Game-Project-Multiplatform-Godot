@@ -79,7 +79,7 @@ GameC <.> GameS : WebRTC
 
 **Map illustration example:**
 <img width="992" height="541" alt="image" src="https://github.com/user-attachments/assets/fd0c4b7b-47fa-4cc9-a0c3-92ca383355df" />
-*This example is not that accurate, but to give an idea on what direction the maps may like.
+*This example is not that accurate, but to give an idea on what direction the maps may like.*
 
 
 ## Multiplayer
