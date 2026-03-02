@@ -20,20 +20,18 @@ Current services planned:
 
 ## CombasSystemService.cs
 
-# CombatSystemService.cs
-
-## Main idea
+### Main idea
 1. Put combat state (health + armor) on an entity using **`CombatContainer`**.
 2. Create an attack using **`DamageApply`** (raw damage per `DamageType`).
 3. Armor is stored as **`DamageArmor`** (% reduction per `DamageType`).
 4. Call `DamageApply.ApplyTo(target)` (or `target.ApplyDamage(damage)`) to deal damage.
 
-## CombatContainer (put this on entities)
+### CombatContainer (put this on entities)
 `CombatContainer` holds:
 - `Health` (int)
 - `Armor` (`DamageArmor`)
 
-### Create a target
+#### Create a target
 ```csharp
 using Combat;
 
@@ -43,7 +41,7 @@ var target = new CombatContainer(
 );
 ```
 
-### Deal damage to the target
+#### Deal damage to the target
 ```csharp
 var hit = new DamageApply(fire: 50); // only set what you care about
 
@@ -51,10 +49,10 @@ var (isDead, damageTaken) = hit.ApplyTo(target);
 // target.Health was reduced by damageTaken
 ```
 
-## DamageApply (raw damage)
+### DamageApply (raw damage)
 `DamageApply` represents **raw damage amounts** before armor.
 
-### Example
+#### Example
 ```csharp
 var damage = new DamageApply(fire: 50); // ignore the rest
 
@@ -62,13 +60,13 @@ int fire = damage.GetValue(DamageType.Fire);      // 50
 int poison = damage.GetValue(DamageType.Poison);  // 0 (missing = 0)
 ```
 
-## DamageArmor (percent reduction)
+### DamageArmor (percent reduction)
 `DamageArmor` represents **% reduction** per damage type:
 - `0` = no reduction
 - `100` = immune  
 Values are clamped to `0..100`.
 
-### Example
+#### Example
 ```csharp
 var armor = new DamageArmor(fire: 25); // ignore the rest
 
@@ -76,13 +74,13 @@ armor.GetValue(DamageType.Fire);   // 25
 armor.GetValue(DamageType.Poison); // 0 (missing = 0)
 ```
 
-## How armor reduces damage (the math)
+### How armor reduces damage (the math)
 Per damage type:
 ```
 final = raw * (100 - armorPercent) / 100
 ```
 
-## Full example (simple)
+### Full example (simple)
 ```csharp
 using Combat;
 
@@ -99,6 +97,6 @@ var (dead, taken) = attack.ApplyTo(target);
 // target.Health = 100 - 37 = 63
 ```
 
-## InputService.cs
+### InputService.cs
 
 **TODO**
