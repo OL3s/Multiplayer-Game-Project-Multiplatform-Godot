@@ -104,7 +104,7 @@ GameC <.> GameS : WebRTC
 2. Open project in Godot 4.6 Mono  
 3. Run project  
 
-# Database
+## Database
 - MySQL
 
 ## Status
