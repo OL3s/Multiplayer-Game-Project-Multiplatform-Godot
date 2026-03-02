@@ -98,7 +98,7 @@ namespace Combat {
 
 
     /// <summary>
-    /// Raw damage numbers to apply.
+    /// Raw damage numbers to apply. Before armor mitigation.
     /// </summary>
     public class DamageApply : DamageContainer {
         public DamageApply() : base() { }
@@ -117,19 +117,23 @@ namespace Combat {
     /// Armor values are % reduction per type: 0 = no reduction, 100 = immune.
     /// Values are clamped to [0,100].
     /// </summary>
+	/// <example>
+	/// 20 fire armor means "take 20% less fire damage". So 100 fire damage would be reduced to 80, while 50 fire damage would be reduced to 40.
+	/// </example>
     public class DamageArmor : DamageContainer {
         // Clamp happens once here; every other constructor chains to this one.
-        public DamageArmor(IDictionary<DamageType, int> dict) : base(dict) {
+        public DamageArmor(IDictionary<DamageType, int> dict, int baseValue) : base(dict) {
+			SetBaseValue(baseValue);
             ClampAllValues();
         }
 
-        public DamageArmor() : this(new Dictionary<DamageType, int>()) { }
+        public DamageArmor() : this(new Dictionary<DamageType, int>(), 0) { }
 
         public DamageArmor(DamageType type, int value)
-            : this(new Dictionary<DamageType, int> { [type] = value }) { }
+            : this(new Dictionary<DamageType, int> { [type] = value }, 0) { }
 
         public DamageArmor(int? fire = null, int? poison = null, int? pierce = null, int? crush = null, int? explosive = null)
-            : this(BuildDict(fire, poison, pierce, crush, explosive)) { }
+            : this(BuildDict(fire, poison, pierce, crush, explosive), 0) { }
 
         private static Dictionary<DamageType, int> BuildDict(
             int? fire, int? poison, int? pierce, int? crush, int? explosive
@@ -148,6 +152,12 @@ namespace Combat {
                 this[key] = Math.Clamp(this[key], 0, 100);
             }
         }
+
+		private void SetBaseValue(int baseValue) {
+			foreach (DamageType type in Enum.GetValues<DamageType>()) {
+				TryAdd(type, baseValue); // only adds if missing
+			}
+		}
     }
 
     public static class DamageCalculator {
@@ -173,6 +183,9 @@ namespace Combat {
         }
     }
 
+	/// <summary>
+	/// Container for an entity's combat state: health + armor.
+	/// </summary>
     public class CombatContainer {
         public int Health { get; set; }
         public DamageArmor Armor { get; set; }
