@@ -12,7 +12,8 @@ Built in Godot with C#.
 
 <details>
 <summary>PlantUML source</summary>
-
+	
+```
 @startuml
 title Godot Treestructure on runtime
 left to right direction
@@ -30,11 +31,9 @@ node "/root (SceneTree root)" as ROOT {
     component "Menu.tscn\n(root node)" as MENU
     component "Lobby.tscn\n(root node)" as LOBBY
     component "Game.tscn\n(root node)" as GAME {
-
       component "Player.tscn\n(instanced Node)" as PLAYER
       component "TileSetWalls\n(TileMap node)" as WALLS
       component "Props\n(Node2D container)" as PROPS
-
     }
   }
 }
@@ -60,6 +59,8 @@ NET --> GAME
 NET --> LOBBY
 
 @enduml
+```
+
 </details>
 
 Netcoding -> ENet
