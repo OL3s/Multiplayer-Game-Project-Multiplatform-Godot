@@ -136,11 +136,6 @@ S --> C4 : [Rpc(MultiplayerApi.RpcMode.Authority)]\nExecuteFunction(state)
 		- Xbox
 		- Playstation
 
-## Run (Editor)
-1. Install .NET 10  
-2. Open project in Godot 4.6 Mono  
-3. Run project  
-
 ## Database
 - MySQL
 
