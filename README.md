@@ -2,11 +2,16 @@
 Fast-paced 2–8 player 2D PvP arena with fully destructible environment.  
 Built in Godot with C#.
 
-## Tech
+## Tech/Requirements
 - Godot Engine v4.6.1.stable.mono.official.14d19694e (Mono)
 - .NET 10
 - C#
-- Netcoding -> WebRTC
+
+Netcoding -> ENet
+
+## Importent docs
+- **[Services](./documentation/Services.md)**
+
 
 ![Structure](./documentation/godot-runtime-diagram.png)
 
@@ -73,6 +78,11 @@ GameC <.> GameS : WebRTC
 - Round-based matches
 - Skill-based movement & aiming
 
+**Map illustration example:**
+<img width="992" height="541" alt="image" src="https://github.com/user-attachments/assets/fd0c4b7b-47fa-4cc9-a0c3-92ca383355df" />
+*This example is not that accurate, but to give an idea on what direction the maps may like.*
+
+
 ## Multiplayer
 - Server-authoritative model
 - Clients send: input / actions  
@@ -125,35 +135,13 @@ S --> C4 : [Rpc(MultiplayerApi.RpcMode.Authority)]\nExecuteFunction(state)
 		- Xbox
 		- Playstation
 
-## Requirements
-- Godot 4.6 Mono
-- .NET 10 SDK
-
 ## Run (Editor)
 1. Install .NET 10  
 2. Open project in Godot 4.6 Mono  
 3. Run project  
 
-# Database
+## Database
 - MySQL
-
-## Bash commands (bash)
-### Executions
-- sudo systemctl start mysql 
-- sudo systemctl stop mysql
-- sudo systemctl restart mysql
-- sudo systemctl status mysql
-
-### Auto-start boot
-- sudo systemctl enable mysql
-- sudo systemctl disable mysql
-
-### Other info
-- OS → systemd → mysql service → DB server
-- mysql -u gameuser -p
-
-## Export
-Godot → Export → choose platform
 
 ## Status
 Prototype / early development

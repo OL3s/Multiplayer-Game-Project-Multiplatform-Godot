@@ -9,20 +9,19 @@ using GDict  = Godot.Collections.Dictionary;
 public partial class NetworkService : Node
 {
 	private const string InitialScenePath = "res://scenes/lobby/lobby.tscn";
-
 	[Export] public int Port = 7777;
 	[Export] public string DefaultHost = "127.0.0.1";
+	[Export] public string DefaultPlayerName = "Player";
 
 	// Session/peer state (scene-agnostic)
 	public Dictionary<long, PlayerData> Peers = new();
-
+	public MatchConfig CurrentMatchConfig = new();
 	[Signal] public delegate void PeersUpdatedEventHandler();
 
 	public override void _Ready()
 	{
 		// keep debug hook
 		PeersUpdated += () => GD.Print("Peers updated. Total peers: " + Peers.Count);
-
 		CallDeferred(nameof(Boot));
 	}
 
@@ -60,7 +59,8 @@ public partial class NetworkService : Node
 	{
 		if (!Multiplayer.IsServer()) return;
 
-		Peers[id] = new PlayerData(); // default data
+		// Default server-side data until the client sends its local data (name/etc.)
+		Peers[id] = new PlayerData("Noname");
 		EmitSignal(SignalName.PeersUpdated);
 
 		GD.Print($"Peer connected: {id}");
@@ -68,7 +68,7 @@ public partial class NetworkService : Node
 		// Tell ONLY that peer what scene to load (initial join scene)
 		RpcId(id, nameof(RpcLoadScene), InitialScenePath);
 
-		// Broadcast peer snapshot to already-loaded clients
+		// Broadcast current snapshot (client will update its entry right after load)
 		Rpc(nameof(RpcPeersSnapshot), BuildPeersSnapshot());
 	}
 
@@ -111,14 +111,36 @@ public partial class NetworkService : Node
 	{
 		GetTree().ChangeSceneToFile(scenePath);
 
-		// avoid race: send ready next frame
-		CallDeferred(nameof(SendClientReady));
+		// avoid race: send next frame (so scene tree is ready)
+		CallDeferred(nameof(SendClientReadyAndLocalData));
 	}
 
-	private void SendClientReady()
+	private void SendClientReadyAndLocalData()
 	{
 		// ENet server is peer id 1
 		RpcId(1, nameof(RpcClientReady));
+
+		// Send local player data (at least name) so server updates Peers[id]
+		var local = LoadLocalPlayerData();
+		RpcId(1, nameof(RpcClientLocalData), PlayerDataToDict(local));
+	}
+
+	private PlayerData LoadLocalPlayerData()
+	{
+		// TODO: load from user:// config / save file later
+		// For now: only name is "local", rest defaults.
+		var name = (DefaultPlayerName ?? "").Trim();
+		if (name.Length == 0) name = "Noname";
+		if (name.Length > 24) name = name[..24];
+
+		return new PlayerData(name)
+		{
+			Ready = false,
+			TeamId = 0,
+			Credits = 0,
+			Score = 0,
+			Kills = 0,
+		};
 	}
 
 	// client -> server
@@ -134,6 +156,40 @@ public partial class NetworkService : Node
 		RpcId(id, nameof(RpcPeersSnapshot), BuildPeersSnapshot());
 	}
 
+	// client -> server (local machine data like name, cosmetics, etc.)
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+	private void RpcClientLocalData(GDict payload)
+	{
+		if (!Multiplayer.IsServer()) return;
+
+		var id = Multiplayer.GetRemoteSenderId();
+
+		if (!Peers.ContainsKey(id))
+			Peers[id] = new PlayerData("Noname");
+
+		var incoming = DictToPlayerData(payload);
+
+		// sanitize name
+		incoming.Name = (incoming.Name ?? "").Trim();
+		if (incoming.Name.Length == 0) incoming.Name = "Noname";
+		if (incoming.Name.Length > 24) incoming.Name = incoming.Name[..24];
+
+		// Update server state (classes = reference semantics; assignment is still fine)
+		var pd = Peers[id];
+		pd.Name = incoming.Name;
+		pd.TeamId = incoming.TeamId;
+		pd.Credits = incoming.Credits;
+		pd.Score = incoming.Score;
+		pd.Kills = incoming.Kills;
+		// NOTE: you can decide if client is allowed to set Ready; usually server-controlled.
+		// pd.Ready = incoming.Ready;
+
+		EmitSignal(SignalName.PeersUpdated);
+
+		// Broadcast updated snapshot so everyone sees the new name immediately
+		Rpc(nameof(RpcPeersSnapshot), BuildPeersSnapshot());
+	}
+
 	// ---------- PEER STATE SYNC ----------
 	private GArray BuildPeersSnapshot()
 	{
@@ -141,10 +197,17 @@ public partial class NetworkService : Node
 
 		foreach (var kv in Peers)
 		{
+			var id = kv.Key;
+			var p = kv.Value;
+
 			arr.Add(new GDict {
-				{ "id", (int)kv.Key },
-				{ "name", kv.Value.Name },
-				{ "ready", kv.Value.Ready },
+				{ "id", (int)id },
+				{ "name", p.Name ?? "" },
+				{ "ready", p.Ready },
+				{ "teamId", p.TeamId },
+				{ "credits", p.Credits },
+				{ "score", p.Score },
+				{ "kills", p.Kills },
 			});
 		}
 
@@ -161,29 +224,44 @@ public partial class NetworkService : Node
 		{
 			long id = (int)d["id"];
 
-			Peers[id] = new PlayerData
+			Peers[id] = new PlayerData(d.ContainsKey("name") ? (string)d["name"] : "")
 			{
-				Name = d.ContainsKey("name") ? (string)d["name"] : "",
 				Ready = d.ContainsKey("ready") && (bool)d["ready"],
+				TeamId = d.ContainsKey("teamId") ? (int)d["teamId"] : 0,
+				Credits = d.ContainsKey("credits") ? (int)d["credits"] : 0,
+				Score = d.ContainsKey("score") ? (int)d["score"] : 0,
+				Kills = d.ContainsKey("kills") ? (int)d["kills"] : 0,
 			};
 		}
 
 		EmitSignal(SignalName.PeersUpdated);
 	}
 
-	// ---------- TYPES ----------
-	public struct MatchSettings
+	// ---------- helpers ----------
+	private static GDict PlayerDataToDict(PlayerData p)
 	{
-		public ulong MapSeed;
-		public int MapSize;
-
-		public MatchSettings(ulong mapSeed, int mapSize)
+		return new GDict
 		{
-			MapSeed = mapSeed;
-			MapSize = mapSize;
-		}
-		public MatchSettings() : this(((ulong)GD.Randi() << 32) | GD.Randi(), 4) { }
-		public override string ToString() => $"Seed: {MapSeed}, Size: {MapSize}";
+			{ "ready", p.Ready },
+			{ "name", p.Name ?? "" },
+			{ "teamId", p.TeamId },
+			{ "credits", p.Credits },
+			{ "score", p.Score },
+			{ "kills", p.Kills },
+		};
 	}
 
+	private static PlayerData DictToPlayerData(GDict d)
+	{
+		var name = d.ContainsKey("name") ? (string)d["name"] : "";
+
+		return new PlayerData(name)
+		{
+			Ready = d.ContainsKey("ready") && (bool)d["ready"],
+			TeamId = d.ContainsKey("teamId") ? (int)d["teamId"] : 0,
+			Credits = d.ContainsKey("credits") ? (int)d["credits"] : 0,
+			Score = d.ContainsKey("score") ? (int)d["score"] : 0,
+			Kills = d.ContainsKey("kills") ? (int)d["kills"] : 0,
+		};
+	}
 }
