@@ -8,6 +8,60 @@ Built in Godot with C#.
 - .NET 10
 - C# knowledge
 
+<img width="875" height="715" alt="image" src="https://github.com/user-attachments/assets/2ec0488b-7d2a-4da1-bb0d-9b88730abdd4" />
+
+<details>
+<summary>PlantUML source</summary>
+
+@startuml
+title Godot Treestructure on runtime
+left to right direction
+skinparam shadowing false
+skinparam componentStyle rectangle
+
+node "/root (SceneTree root)" as ROOT {
+
+  folder "Autoloads (Services)\n(always loaded as Nodes)" as AUTO {
+    component "InputService\n(Node singleton)" as INP
+    component "NetworkService\n(Node singleton)" as NET
+  }
+
+  folder "Scenes\n(instanced into the tree)" as SCENES {
+    component "Menu.tscn\n(root node)" as MENU
+    component "Lobby.tscn\n(root node)" as LOBBY
+    component "Game.tscn\n(root node)" as GAME {
+
+      component "Player.tscn\n(instanced Node)" as PLAYER
+      component "TileSetWalls\n(TileMap node)" as WALLS
+      component "Props\n(Node2D container)" as PROPS
+
+    }
+  }
+}
+
+rectangle "C# Code\n(not in SceneTree by default)" as CODE {
+  component "CombatSystemService.cs\n(static)" as COMBAT
+  component "MapGenerationService.cs\n(static)" as MAPGEN
+}
+
+' Input / logic flow
+PLAYER <-- INP
+
+' Combat affects gameplay objects
+PLAYER <-- COMBAT
+WALLS  <-- COMBAT
+PROPS  <-- COMBAT
+
+' Map generation affects level
+GAME <-- MAPGEN
+
+' Networking
+NET --> GAME
+NET --> LOBBY
+
+@enduml
+</details>
+
 Netcoding -> ENet
 
 ## Importent docs
