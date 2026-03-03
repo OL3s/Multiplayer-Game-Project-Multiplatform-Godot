@@ -146,6 +146,7 @@ GameC <.> GameS : WebRTC
 - Dedicated server supported
 
 ![Communication Model](./documentation/network-usage-diag.png)
+*How network comminucation works on ENet*
 
 <details>
 <summary>PlantUML source</summary>
