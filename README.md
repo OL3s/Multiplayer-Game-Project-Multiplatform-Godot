@@ -4,7 +4,7 @@ Built in Godot with C#.
 
 ## Tech/Requirements
 - Godot Engine v4.6.1.stable.mono.official.14d19694e (Mono)
-   - *must download the .NET version og dodot)
+   - *must download the .NET version og dodot*
 - .NET 10
 - C# knowledge
 
