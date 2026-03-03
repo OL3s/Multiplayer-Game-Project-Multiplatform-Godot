@@ -20,6 +20,7 @@ public partial class NetworkService : Node
 
 	public override void _Ready()
 	{
+		GD.Print("NetworkService ready.");
 		// keep debug hook
 		PeersUpdated += () => GD.Print("Peers updated. Total peers: " + Peers.Count);
 		CallDeferred(nameof(Boot));
