@@ -74,10 +74,46 @@ GameC <.> GameS : WebRTC
 - Skill-based movement & aiming
 
 ## Multiplayer
-- Server-authoritative model  
+- Server-authoritative model
 - Clients send: input / actions  
 - Server syncs: state / destruction / hits  
 - Dedicated server supported
+
+![Communication Model](./documentation/network-usage-diag.png)
+
+<details>
+<summary>PlantUML source</summary>
+
+```
+@startuml
+title ENet RPC Flow (Server Authoritative)
+left to right direction
+skinparam shadowing false
+
+rectangle "Client 1" as C1
+rectangle "Client 2" as C2
+rectangle "Client 3" as C3
+rectangle "Client 4" as C4
+
+node "Server" as S
+
+' Client 1 sends request to server
+C1 --> S : [Rpc(MultiplayerApi.RpcMode.AnyPeer)]\nRequestFunction(payload)
+
+' Server executes authoritative logic
+S --> S : Validate + Simulate
+
+' Server broadcasts result to all clients (including sender)
+S --> C1 : [Rpc(MultiplayerApi.RpcMode.Authority)]\nExecuteFunction(state)
+S --> C2 : [Rpc(MultiplayerApi.RpcMode.Authority)]\nExecuteFunction(state)
+S --> C3 : [Rpc(MultiplayerApi.RpcMode.Authority)]\nExecuteFunction(state)
+S --> C4 : [Rpc(MultiplayerApi.RpcMode.Authority)]\nExecuteFunction(state)
+
+@enduml
+```
+
+</details>
+
 - Crossplay on most platforms
 	- Android
 	- HTML5
