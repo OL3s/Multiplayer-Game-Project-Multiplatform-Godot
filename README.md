@@ -301,31 +301,14 @@ The project supports command-line arguments to control runtime behavior.
 | `--port <int>` | Sets the **network port** used by the server |
 | `--headless` | Runs Godot **without rendering or graphics** (recommended for dedicated servers) |
 
----
-
 ## Example: Run Dedicated Server
 
-### Using exported game build
+| Method                               | Command                                          |
+| ------------------------------------ | ------------------------------------------------ |
+| Exported game build                  | `game.exe --server --port 7777`                  |
+| Godot CLI (inside project directory) | `godot --headless --server --port 7777`          |
+| Godot CLI (explicit project path)    | `godot --headless --path . --server --port 7777` |
 
-```
-game.exe --server --port 7777
-```
-
----
-
-### Using Godot CLI (when already inside the project directory)
-
-```
-godot --headless --server --port 7777
-```
-
----
-
-### Using Godot CLI with explicit project path
-
-```
-godot --headless --path . --server --port 7777
-```
 
 ---
 
