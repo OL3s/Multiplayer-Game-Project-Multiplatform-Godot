@@ -16,7 +16,7 @@ public partial class Player : CharacterBody2D
 	{
 		Vector2 movement = _input.CurrentInputState.MovementVector;
 		Velocity = movement * Speed;
-		MoveAndSlide();
+		MoveAndSlide(); // TODO - NetworkService.IsServer ? MoveAndSlide() : MoveAndSlideWithSnap() for client-side prediction and server reconciliation
 	}
 
 }
