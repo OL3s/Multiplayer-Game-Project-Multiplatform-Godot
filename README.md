@@ -215,7 +215,7 @@ The server performs:
 ## Network Communication Model
 
 <p align="center">
-  <img src="./documentation/network-usage-diag.png" width="600" alt="Network model">
+  <img src="./documentation/network-usage-diag.png" width="1000" alt="Network model">
   <br>
   <em>ENet communication model where clients send requests and the server broadcasts authoritative results.</em>
 </p>
