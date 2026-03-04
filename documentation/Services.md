@@ -3,22 +3,34 @@
 This game is basing itself on good practices in **high cohesion, low coupling**, this is done by splitting the game in to different services.
 
 Current services planned:
-| Services | [MapGeneratorService](##mapgeneratorservicecs) | [AnimationService](##animationservicecs) | [NetworkService (autoload)](##networkservicecs) | [CombatSystemService](##combatsystemservicecs) | [InputService](##InputServicecs)
+
+| Services | MapGeneratorService | AnimationService | NetworkService (autoload) | CombatSystemService | InputService |
 | - | - | - | - | - | - |
 | Description | Generates maps and relays the data generated to the godot engine | Animation function to add on top of vector2D positions * time | Networking for multiplayer gameplay | Calculation for ingame combat, damage etc | Fetch input from player (gamepad, touch, keyboard etc) and relays it |
-## MapGeneratorService.cs
+
+<details>
+<summary>MapGeneratorService.cs</summary>
 
 **TODO**
 
-## AnimationService.cs
+</details>
+
+<details>
+<summary>AnimationService.cs</summary>
 
 **TODO**
 
-## NetworkingService.cs
+</details>
+
+<details>
+<summary>NetworkService.cs</summary>
 
 **TODO**
 
-## CombasSystemService.cs
+</details>
+
+<details>
+<summary>CombatSystemService.cs</summary>
 
 ### Main idea
 1. Put combat state (health + armor) on an entity using **`CombatContainer`**.
@@ -27,76 +39,75 @@ Current services planned:
 4. Call `DamageApply.ApplyTo(target)` (or `target.ApplyDamage(damage)`) to deal damage.
 
 ### CombatContainer (put this on entities)
+
 `CombatContainer` holds:
+
 - `Health` (int)
 - `Armor` (`DamageArmor`)
 
 #### Create a target
+
 ```csharp
 using Combat;
 
 var target = new CombatContainer(
     health: 100,
-    armor: new DamageArmor(fire: 25) // only set what you care about
+    armor: new DamageArmor(fire: 25)
 );
 ```
 
 #### Deal damage to the target
+
 ```csharp
-var hit = new DamageApply(fire: 50); // only set what you care about
+var hit = new DamageApply(fire: 50);
 
 var (isDead, damageTaken) = hit.ApplyTo(target);
-// target.Health was reduced by damageTaken
 ```
 
 ### DamageApply (raw damage)
-`DamageApply` represents **raw damage amounts** before armor.
 
-#### Example
 ```csharp
-var damage = new DamageApply(fire: 50); // ignore the rest
+var damage = new DamageApply(fire: 50);
 
-int fire = damage.GetValue(DamageType.Fire);      // 50
-int poison = damage.GetValue(DamageType.Poison);  // 0 (missing = 0)
+int fire = damage.GetValue(DamageType.Fire);
+int poison = damage.GetValue(DamageType.Poison);
 ```
 
 ### DamageArmor (percent reduction)
-`DamageArmor` represents **% reduction** per damage type:
-- `0` = no reduction
-- `100` = immune  
-Values are clamped to `0..100`.
 
-#### Example
 ```csharp
-var armor = new DamageArmor(fire: 25); // ignore the rest
+var armor = new DamageArmor(fire: 25);
 
-armor.GetValue(DamageType.Fire);   // 25
-armor.GetValue(DamageType.Poison); // 0 (missing = 0)
+armor.GetValue(DamageType.Fire);
+armor.GetValue(DamageType.Poison);
 ```
 
-### How armor reduces damage (the math)
-Per damage type:
+### How armor reduces damage
+
 ```
 final = raw * (100 - armorPercent) / 100
 ```
 
-### Full example (simple)
+### Full example
+
 ```csharp
 using Combat;
 
 var target = new CombatContainer(
     health: 100,
-    armor: new DamageArmor(fire: 25) // 25% fire reduction, everything else defaults to 0
+    armor: new DamageArmor(fire: 25)
 );
 
-var attack = new DamageApply(fire: 50); // only fire damage
+var attack = new DamageApply(fire: 50);
 
 var (dead, taken) = attack.ApplyTo(target);
-
-// fire: 50 * (100-25)/100 = 37
-// target.Health = 100 - 37 = 63
 ```
 
-### InputService.cs
+</details>
+
+<details>
+<summary>InputService.cs</summary>
 
 **TODO**
+
+</details>
