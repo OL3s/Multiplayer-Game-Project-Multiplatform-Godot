@@ -38,25 +38,27 @@ Current services planned:
 3. Armor is stored as **`DamageArmor`** (% reduction per `DamageType`).
 4. Call `DamageApply.ApplyTo(target)` (or `target.ApplyDamage(damage)`) to deal damage.
 
-### CombatContainer (put this on entities)
+---
+
+# CombatContainer (put this on entities)
 
 `CombatContainer` holds:
 
 - `Health` (int)
 - `Armor` (`DamageArmor`)
 
-#### Create a target
+### Create a target
 
 ```csharp
 using Combat;
 
 var target = new CombatContainer(
     health: 100,
-    armor: new DamageArmor(fire: 25)
+    armor: new DamageArmor(0, fire: 25)
 );
 ```
 
-#### Deal damage to the target
+### Deal damage to the target
 
 ```csharp
 var hit = new DamageApply(fire: 50);
@@ -64,7 +66,9 @@ var hit = new DamageApply(fire: 50);
 var (isDead, damageTaken) = hit.ApplyTo(target);
 ```
 
-### DamageApply (raw damage)
+---
+
+# DamageApply (raw damage)
 
 ```csharp
 var damage = new DamageApply(fire: 50);
@@ -73,29 +77,69 @@ int fire = damage.GetValue(DamageType.Fire);
 int poison = damage.GetValue(DamageType.Poison);
 ```
 
-### DamageArmor (percent reduction)
+---
+
+# DamageArmor (percent reduction)
 
 ```csharp
-var armor = new DamageArmor(fire: 25);
+var armor = new DamageArmor(0, fire: 25);
 
 armor.GetValue(DamageType.Fire);
 armor.GetValue(DamageType.Poison);
 ```
 
-### How armor reduces damage
+---
+
+# Base armor value
+
+`DamageArmor` supports a **base defense value** applied to all damage types.
+
+Constructor format:
+
+```csharp
+new DamageArmor(baseValue, fire, poison, pierce, crush, explosive)
+```
+
+- `baseValue` = default armor applied to **all damage types**
+- Any provided damage type **overrides the base value**
+
+### Example
+
+```csharp
+var armor = new DamageArmor(
+    baseValue: 10,   // 10% reduction to all damage
+    fire: 25         // fire overrides base value
+);
+```
+
+Result internally:
+
+```
+Fire       = 25
+Poison     = 10
+Pierce     = 10
+Crush      = 10
+Explosive  = 10
+```
+
+---
+
+# How armor reduces damage
 
 ```
 final = raw * (100 - armorPercent) / 100
 ```
 
-### Full example
+---
+
+# Full example
 
 ```csharp
 using Combat;
 
 var target = new CombatContainer(
     health: 100,
-    armor: new DamageArmor(fire: 25)
+    armor: new DamageArmor(10, fire: 25)
 );
 
 var attack = new DamageApply(fire: 50);
