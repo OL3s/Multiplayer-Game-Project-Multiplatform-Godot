@@ -1,18 +1,75 @@
-# Game Title
-Fast-paced 2–8 player 2D PvP arena with fully destructible environment.  
-Built in Godot with C#.
+# Arena Destruction (working title)
 
-## Tech/Requirements
-- Godot Engine v4.6.1.stable.mono.official.14d19694e (Mono)
-   - *must download the .NET version og dodot*
-- .NET 10
-- C# knowledge
+Fast-paced **2–8 player 2D PvP arena combat** with a **fully destructible environment**.  
+Built using **Godot + C#** with a **server-authoritative multiplayer model**.
 
-<img width="875" height="715" alt="image" src="https://github.com/user-attachments/assets/2ec0488b-7d2a-4da1-bb0d-9b88730abdd4" />
+---
+
+# Overview
+
+Players fight in destructible arenas where terrain, props, and structures can be destroyed dynamically during combat.  
+Matches are **round-based** and emphasize **skillful movement, positioning, and aiming**.
+
+Key ideas:
+
+* Small competitive arenas
+* Fully destructible tile-based maps
+* Server-authoritative networking
+* Cross-platform multiplayer
+* Modular architecture using services
+
+---
+
+# Technology
+
+### Engine
+
+* **Godot Engine v4.6.1 (Mono)**
+* Requires the **.NET version of Godot**
+
+### Language
+
+* **C#**
+* **.NET 10**
+
+### Networking
+
+* **ENet**
+* Server-authoritative simulation
+
+### Backend
+
+* **MySQL**
+* External HTTP services (login / matchmaking)
+
+---
+
+# Architecture
+
+The game is structured around **low coupling and high cohesion** by splitting systems into independent services.
+
+Examples:
+
+* InputService
+* NetworkService
+* CombatSystemService
+* MapGenerationService
+
+Core gameplay objects then depend on these services instead of directly depending on each other.
+
+---
+
+## Godot Runtime Structure
+
+<p align="center">
+  <img src="./documentation/godot-treestructure-runtime.png" width="600" alt="Godot runtime tree">
+  <br>
+  <em>Runtime scene tree structure showing autoload services, scenes, and gameplay objects.</em>
+</p>
 
 <details>
 <summary>PlantUML source</summary>
-	
+
 ```
 @startuml
 title Godot Treestructure on runtime
@@ -43,33 +100,27 @@ rectangle "C# Code\n(not in SceneTree by default)" as CODE {
   component "MapGenerationService.cs\n(static)" as MAPGEN
 }
 
-' Input / logic flow
 PLAYER <-- INP
-
-' Combat affects gameplay objects
 PLAYER <-- COMBAT
-WALLS  <-- COMBAT
-PROPS  <-- COMBAT
-
-' Map generation affects level
+WALLS <-- COMBAT
+PROPS <-- COMBAT
 GAME <-- MAPGEN
-
-' Networking
 NET --> GAME
 NET --> LOBBY
-
 @enduml
 ```
 
 </details>
 
-Netcoding -> ENet
+---
 
-## Importent docs
-- **[Services](./documentation/Services.md)**
+## Backend / Runtime Architecture
 
-
-![Structure](./documentation/godot-runtime-diagram.png)
+<p align="center">
+  <img src="./documentation/godot-runtime-diagram.png" width="600" alt="Runtime architecture">
+  <br>
+  <em>High-level system architecture including clients, server runtime, HTTP services, and database.</em>
+</p>
 
 <details>
 <summary>PlantUML source</summary>
@@ -80,8 +131,6 @@ left to right direction
 skinparam monochrome true
 skinparam shadowing false
 skinparam linetype ortho
-skinparam usecaseBorderThickness 2
-skinparam rectangleBorderThickness 2
 
 database "MySQL" as DB
 
@@ -112,41 +161,64 @@ rectangle "Godot Runtime (same codebase)" {
   }
 }
 
-' HTTP flows
 Menu --> Matchmaker
 LoginS <--> DB
-
-' Match assignment
 Matchmaker --> LobbyS : Docker execute
 
-' Netcoding (WebRTC)
 LobbyC <.> LobbyS : WebRTC
 GameC <.> GameS : WebRTC
-
 @enduml
 ```
+
 </details>
 
-## Core Gameplay
-- 2–8 players
-- 2D PvP arena combat
-- Fully destructible tilebased map
-- Round-based matches
-- Skill-based movement & aiming
+---
 
-**Map illustration example:**
-<img width="992" height="541" alt="image" src="https://github.com/user-attachments/assets/fd0c4b7b-47fa-4cc9-a0c3-92ca383355df" />
-*This example is not that accurate, but to give an idea on what direction the maps may like.*
+# Gameplay
 
+Core gameplay characteristics:
 
-## Multiplayer
-- Server-authoritative model
-- Clients send: input / actions  
-- Server syncs: state / destruction / hits  
-- Dedicated server supported
+* **2–8 players**
+* **2D PvP arena combat**
+* **Fully destructible tile-based environments**
+* **Round-based matches**
+* **Skill-based movement and aiming**
 
-![Communication Model](./documentation/network-usage-diag.png)
-*How network comminucation works on ENet*
+## Example Arena Layout
+
+<p align="center">
+  <img src="./documentation/map-example.png" width="600" alt="Map concept">
+  <br>
+  <em>Example illustration of a destructible arena layout concept.</em>
+</p>
+
+---
+
+# Multiplayer
+
+The game uses a **server-authoritative model**.
+
+Clients only send:
+
+* Input
+* Ability usage
+* Requests
+
+The server performs:
+
+* Validation
+* Simulation
+* Hit detection
+* Destruction
+* State synchronization
+
+## Network Communication Model
+
+<p align="center">
+  <img src="./documentation/network-usage-diag.png" width="600" alt="Network model">
+  <br>
+  <em>ENet communication model where clients send requests and the server broadcasts authoritative results.</em>
+</p>
 
 <details>
 <summary>PlantUML source</summary>
@@ -164,39 +236,150 @@ rectangle "Client 4" as C4
 
 node "Server" as S
 
-' Client 1 sends request to server
-C1 --> S : [Rpc(MultiplayerApi.RpcMode.AnyPeer)]\nRequestFunction(payload)
-
-' Server executes authoritative logic
+C1 --> S : RequestFunction(payload)
 S --> S : Validate + Simulate
 
-' Server broadcasts result to all clients (including sender)
-S --> C1 : [Rpc(MultiplayerApi.RpcMode.Authority)]\nExecuteFunction(state)
-S --> C2 : [Rpc(MultiplayerApi.RpcMode.Authority)]\nExecuteFunction(state)
-S --> C3 : [Rpc(MultiplayerApi.RpcMode.Authority)]\nExecuteFunction(state)
-S --> C4 : [Rpc(MultiplayerApi.RpcMode.Authority)]\nExecuteFunction(state)
+S --> C1 : ExecuteFunction(state)
+S --> C2 : ExecuteFunction(state)
+S --> C3 : ExecuteFunction(state)
+S --> C4 : ExecuteFunction(state)
 
 @enduml
 ```
 
 </details>
 
-- Crossplay on most platforms
-	- Android
-	- HTML5
-	- Windows
-	- Linux
-	- Others come later:
-		- iOS
-		- MacOS
-		- Xbox
-		- Playstation
+---
 
-## Database
-- MySQL
+# Platform Support
 
-## Status
-Prototype / early development
+Target platforms:
 
-## License
-All rights reserved. No use, distribution, or modification permitted without permission from the authors.
+* Windows
+* Linux
+* Android
+* HTML5
+
+Planned later:
+
+* iOS
+* MacOS
+* Xbox
+* Playstation
+
+---
+
+# Setup
+
+### Requirements
+
+Install:
+
+* **Godot Mono (.NET version)**
+* **.NET 10 SDK**
+
+Then:
+
+```
+git clone <repo>
+open project in Godot
+```
+
+Run normally in editor.
+
+---
+
+# Run Arguments
+
+The project supports command-line arguments to control runtime behavior.
+
+### Available arguments
+
+| Argument | Description |
+|--------|-------------|
+| `--server` | Starts the game in **server mode** |
+| `--port <int>` | Sets the **network port** used by the server |
+| `--headless` | Runs Godot **without rendering or graphics** (recommended for dedicated servers) |
+
+---
+
+## Example: Run Dedicated Server
+
+### Using exported game build
+
+```
+game.exe --server --port 7777
+```
+
+---
+
+### Using Godot CLI (when already inside the project directory)
+
+```
+godot --headless --server --port 7777
+```
+
+---
+
+### Using Godot CLI with explicit project path
+
+```
+godot --headless --path . --server --port 7777
+```
+
+---
+
+## Behavior
+
+* If `--server` is present → game runs as a **server**
+* If `--server` is absent → game runs as a **client**
+* `--port` overrides the default server port
+* `--headless` disables rendering for efficient dedicated servers
+
+Arguments are parsed at runtime using:
+
+```
+OS.GetCmdlineArgs()
+```
+
+---
+
+# Documentation
+
+Additional documentation:
+
+* **[Services documentation](./documentation/Services.md)**
+
+More documentation will be added as the project evolves.
+
+---
+
+# Database
+
+Backend storage uses:
+
+* **MySQL**
+
+Used for:
+
+* Accounts
+* Matchmaking
+* Player data
+
+---
+
+# Status
+
+Project stage:
+
+**Prototype / early development**
+
+Major systems still under development.
+
+---
+
+# License
+
+All rights reserved.
+
+No use, distribution, or modification permitted without permission from the authors.
