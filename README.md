@@ -54,6 +54,7 @@ Examples:
 * NetworkService
 * CombatSystemService
 * MapGenerationService
+* AnimationService
 
 Core gameplay objects then depend on these services instead of directly depending on each other.
 
