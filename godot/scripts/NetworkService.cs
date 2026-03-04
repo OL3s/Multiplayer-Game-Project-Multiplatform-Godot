@@ -46,7 +46,7 @@ public partial class NetworkService : Node
 
 	// ---------- OS ARGUMENTS ------------
 	public bool IsServerMode() => OS.GetCmdlineArgs().Contains("--server");
-	
+
 	private void ApplyCmdArgs()
 	{
 		var args = OS.GetCmdlineArgs();
@@ -60,7 +60,7 @@ public partial class NetworkService : Node
 			}
 		}
 	}
-	
+
 	private void PrintHelp()
 	{
 		GD.Print(

@@ -3,8 +3,7 @@ using System;
 
 public partial class InputService : Node
 {
-	public Vector2 MovementVector { get; private set; } = Vector2.Zero;
-	public Vector2 AimVector { get; private set; } = Vector2.Zero;
+	public InputState CurrentInputState { get; private set; }
 	public Vector2 PlayerPosition { get; set; } = Vector2.Zero; // This should be updated by the player node
 	private bool EnableTouchControls { get; set; } = false;
 	private bool EnableMouseAiming { get; set; } = true;
@@ -18,7 +17,7 @@ public partial class InputService : Node
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		InputState inputs = new InputState(EnableMouseAiming);
+		CurrentInputState = new InputState(EnableMouseAiming);
 		if (EnableTouchControls)
 		{
 			// TODO - update movement and aim vectors based on touch input
@@ -28,6 +27,7 @@ public partial class InputService : Node
 			// TODO - update aim vector based on mouse input and player position
 			// AimVector = (MousePosition - PlayerPosition).Normalized();
 		}
+		// GD.Print(CurrentInputState.ToString());
 	}
 
 	public struct InputState
@@ -53,6 +53,11 @@ public partial class InputService : Node
 			IsPressingPickup = Input.IsActionPressed("pickup");
 			IsDroppingWeapon = Input.IsActionPressed("drop_weapon");
 			IsAiming = enableMouseAiming ? Input.IsActionPressed("aim") : AimVector.Length() > 0.5f;
+		}
+
+		public override string ToString()
+		{
+			return $"Movement: {MovementVector}, Aim: {AimVector}, Shooting: {IsShooting}, Reloading: {IsReloading}, SwitchingWeapon: {IsSwitchingWeapon}, UsingGadget: {IsUsingGadget}, PressingPickup: {IsPressingPickup}, DroppingWeapon: {IsDroppingWeapon}, Aiming: {IsAiming}";
 		}
 	}
 }
