@@ -9,6 +9,7 @@ using GDict  = Godot.Collections.Dictionary;
 public partial class NetworkService : Node
 {
 	private const string InitialScenePath = "res://scenes/lobby/lobby.tscn";
+	public bool IsServer;
 	[Export] public int Port = 7777;
 	[Export] public string DefaultHost = "127.0.0.1";
 	[Export] public string DefaultPlayerName = "Player";
@@ -20,6 +21,12 @@ public partial class NetworkService : Node
 
 	public override void _Ready()
 	{
+<<<<<<< Updated upstream
+=======
+		PrintHelp();
+		GD.Print("NetworkService ready.");
+		IsServer = IsServerMode();
+>>>>>>> Stashed changes
 		// keep debug hook
 		PeersUpdated += () => GD.Print("Peers updated. Total peers: " + Peers.Count);
 		CallDeferred(nameof(Boot));
@@ -27,7 +34,7 @@ public partial class NetworkService : Node
 
 	private void Boot()
 	{
-		if (IsServerMode())
+		if (IsServer)
 		{
 			StartServer();
 			GetTree().ChangeSceneToFile(InitialScenePath);
@@ -38,7 +45,31 @@ public partial class NetworkService : Node
 		}
 	}
 
+	// ---------- OS ARGUMENTS ------------
 	public bool IsServerMode() => OS.GetCmdlineArgs().Contains("--server");
+	
+	private void ApplyCmdArgs()
+	{
+		var args = OS.GetCmdlineArgs();
+
+		for (int i = 0; i < args.Length; i++)
+		{
+			if (args[i] == "--port" && i + 1 < args.Length)
+			{
+				if (int.TryParse(args[i + 1], out var p))
+					Port = p;
+			}
+		}
+	}
+	
+	private void PrintHelp()
+	{
+		GD.Print(
+			@"Arguments:
+			--server          Run as server
+			--port <number>   Override port (default 7777)"
+		);
+	}
 
 	// ---------- SERVER START ----------
 	private void StartServer()
@@ -88,7 +119,7 @@ public partial class NetworkService : Node
 	// ---------- CLIENT JOIN ----------
 	public void JoinGame(string host = "")
 	{
-		if (IsServerMode()) return;
+		if (IsServer) return;
 
 		var h = string.IsNullOrWhiteSpace(host) ? DefaultHost : host;
 
