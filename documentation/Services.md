@@ -100,7 +100,7 @@ var target = new CombatContainer(
 
 var attack = new DamageApply(fire: 50);
 
-var (dead, taken) = attack.ApplyTo(target);
+var (isDead, damageTaken) = attack.ApplyTo(target);
 ```
 
 </details>
