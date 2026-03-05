@@ -29,6 +29,7 @@ public partial class PlayerSpriteAnimate : Sprite2D
 	public override void _Process(double delta)
 	{
 		if (_networkService != null && _networkService.IsServer) return;
+		
 		// --- Moving Animations ---
 		_time = IsMoving ? _time + delta : 0;
 		if (IsMoving)
