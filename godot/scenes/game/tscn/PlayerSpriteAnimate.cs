@@ -6,6 +6,7 @@ public partial class PlayerSpriteAnimate : Sprite2D
 {
 	private double _time;
 	private Vector2 _baseLocalPos;
+	private NetworkService _networkService;
 	private bool IsMoving => GetParent<Player>().Velocity.Length() > 0.1f;
 	public SpriteTarget SpriteTarget = new SpriteTarget(0, 0, 0, 1, 1);
 	[Export] public float MoveSwaySpeed = 10f;
@@ -18,11 +19,16 @@ public partial class PlayerSpriteAnimate : Sprite2D
 		GD.Print("PlayerSpriteAnimate ready.");
 		_time = 0;
 		_baseLocalPos = Position; // local offset in parent space
+		_networkService = GetNodeOrNull<NetworkService>("/root/NetworkService");
+		if (_networkService != null && _networkService.IsServer)
+		{
+			SetProcess(false);
+		}
 	}
 
 	public override void _Process(double delta)
 	{
-		
+		if (_networkService != null && _networkService.IsServer) return;
 		// --- Moving Animations ---
 		_time = IsMoving ? _time + delta : 0;
 		if (IsMoving)
