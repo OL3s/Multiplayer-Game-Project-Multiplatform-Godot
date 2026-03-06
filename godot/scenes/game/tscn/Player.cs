@@ -3,7 +3,7 @@ using System;
 
 public partial class Player : CharacterBody2D
 {
-	[Export] public float Speed = 250f;
+	[Export] public float DefaultSpeed = 250f;
 	private InputService _input;
 
 	public override void _Ready()
@@ -13,8 +13,15 @@ public partial class Player : CharacterBody2D
 
 	public override void _PhysicsProcess(double delta)
 	{
-		Vector2 movement = _input.CurrentInputState.MovementVector;
-		Velocity = movement * Speed;
+		var _currentInput = _input.CurrentInputState;
+		
+		// --- Speed multiplyers ---
+		float speedMultiplyer = 1;
+		speedMultiplyer *= (_currentInput.IsAiming ? .5f : 1f);
+		// -------------------------
+		
+		Vector2 movement = _currentInput.MovementVector;
+		Velocity = movement * DefaultSpeed * speedMultiplyer;
 		MoveAndSlide(); // TODO - NetworkService.IsServer ? MoveAndSlide() : MoveAndSlideWithSnap() for client-side prediction and server reconciliation
 	}
 

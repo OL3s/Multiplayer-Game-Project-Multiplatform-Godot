@@ -44,7 +44,8 @@ public partial class InputService : Node
 
 		public InputState(bool enableMouseAiming)
 		{
-			MovementVector = Input.GetVector("move_left", "move_right", "move_up", "move_down");
+			var _moveVect = Input.GetVector("move_left", "move_right", "move_up", "move_down");
+			MovementVector = (_moveVect.Length() > .2f) ? _moveVect : Vector2.Zero;
 			AimVector = Input.GetVector("aim_left",  "aim_right",  "aim_up",  "aim_down");
 			IsShooting = Input.IsActionPressed("shoot");
 			IsReloading = Input.IsActionPressed("reload");
@@ -52,7 +53,7 @@ public partial class InputService : Node
 			IsUsingGadget = Input.IsActionPressed("use_gadget");
 			IsPressingPickup = Input.IsActionPressed("pickup");
 			IsDroppingWeapon = Input.IsActionPressed("drop_weapon");
-			IsAiming = enableMouseAiming ? Input.IsActionPressed("aim") : AimVector.Length() > 0.5f;
+			IsAiming = enableMouseAiming ? Input.IsActionPressed("aim") : AimVector.Length() > 0.8f;
 		}
 
 		public override string ToString()
