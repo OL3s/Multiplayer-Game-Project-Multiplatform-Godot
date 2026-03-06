@@ -54,18 +54,25 @@ public partial class EntityFactory : Node
 		return obj;
 	}
 
-	public Bullet SpawnBullet(Vector2 direction, Node? parent = null, float? speed = null, float? maxDistance = null)
+	public Bullet SpawnBullet(
+		Vector2 direction, 
+		CharacterBody2D? shooter = null, 
+		Vector2? position = null, 
+		float? speed = null, 
+		float? maxDistance = null)
 	{
-		var bullet = Spawn<Bullet>("res://scenes/game/tscn/bullet_2d.tscn", parent: parent);
+		var bullet = Spawn<Bullet>("res://scenes/game/tscn/bullet_2d.tscn");
 		if (speed.HasValue)         bullet.Speed = speed.Value;
 		if (maxDistance.HasValue)   bullet.MaxDistance = maxDistance.Value;
 									bullet.Direction = direction;
+									bullet.OwnerNode = shooter;
+									bullet.GlobalPosition = position ?? shooter?.GlobalPosition ?? Vector2.Zero;
 		return bullet;
 	}
 
-	public Player SpawnPlayer(Vector2 position, Node? parent = null)
+	public Player SpawnPlayer(Vector2 position)
 	{
-		var player = Spawn<Player>("res://scenes/game/tscn/Player.tscn", parent: parent);
+		var player = Spawn<Player>("res://scenes/game/tscn/Player.tscn");
 		player.GlobalPosition = position;
 		return player;
 	}

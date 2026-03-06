@@ -22,7 +22,7 @@ public partial class Player : CharacterBody2D
 	{
 		if (Input.IsKeyPressed(Key.Space))
 		{
-			EntityFactory.Instance?.SpawnBullet(new Vector2(1, 0), parent: this, speed: 1500f, maxDistance: 2000f);
+			EntityFactory.Instance?.SpawnBullet(Velocity.Normalized(), shooter: this, speed: 1500f, maxDistance: 2000f);
 		}
 	}
 
