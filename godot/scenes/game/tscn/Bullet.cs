@@ -1,6 +1,8 @@
 using Godot;
 using System;
 
+#nullable enable
+
 public partial class Bullet : Node2D
 {
 	[Export] public float Speed = 1200f;
