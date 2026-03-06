@@ -7,7 +7,7 @@ public partial class Player : CharacterBody2D
 	private InputService _input;
 
 	public override void _Ready()
-	{ds
+	{
 		_input = GetNode<InputService>("/root/InputService");
 	}
 
