@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 NetworkService="*uid://d33visbn1y2t5"
 InputService="*uid://bju2m4q3u3880"
+EntityFactory="*uid://dfu7tsgx52ybm"
 
 [dotnet]
 

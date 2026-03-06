@@ -8,7 +8,6 @@ public partial class Player : CharacterBody2D
 
 	public override void _Ready()
 	{
-		GD.Print("Player ready.");
 		_input = GetNode<InputService>("/root/InputService");
 	}
 
@@ -17,6 +16,14 @@ public partial class Player : CharacterBody2D
 		Vector2 movement = _input.CurrentInputState.MovementVector;
 		Velocity = movement * Speed;
 		MoveAndSlide(); // TODO - NetworkService.IsServer ? MoveAndSlide() : MoveAndSlideWithSnap() for client-side prediction and server reconciliation
+	}
+
+	public override void _Process(double delta)
+	{
+		if (Input.IsKeyPressed(Key.Space))
+		{
+			EntityFactory.Instance?.SpawnBullet(new Vector2(1, 0), speed: 1500f, maxDistance: 2000f);
+		}
 	}
 
 }
