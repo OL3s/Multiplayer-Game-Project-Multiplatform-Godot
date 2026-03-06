@@ -61,6 +61,18 @@ public partial class EntityFactory : Node
 		float? speed = null, 
 		float? maxDistance = null)
 	{
+		if (position == null && shooter == null)
+		{
+			GD.PrintErr("SpawnBullet requires either a position or a shooter to determine the spawn location.");
+			return null!;
+		}
+
+		if (direction == Vector2.Zero)
+		{
+			GD.PrintErr("SpawnBullet requires a non-zero direction vector.");
+			return null!;
+		}
+
 		var bullet = Spawn<Bullet>("res://scenes/game/tscn/bullet_2d.tscn");
 		if (speed.HasValue)         bullet.Speed = speed.Value;
 		if (maxDistance.HasValue)   bullet.MaxDistance = maxDistance.Value;

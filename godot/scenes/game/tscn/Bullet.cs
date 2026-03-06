@@ -12,11 +12,10 @@ public partial class Bullet : Node2D
 	// Godot layer index 1 = bit 0
 	// Godot layer index 2 = bit 1
 	[Export] public uint CollisionMask = (1u << 0) | (1u << 1);
-
 	[Export] public bool CollideWithBodies = true;
 	[Export] public bool CollideWithAreas = true;
-	public Vector2 Direction = new(1, .1f);
-	public CollisionObject2D OwnerNode;
+	public Vector2 Direction = Vector2.Right;
+	public CollisionObject2D? OwnerNode;
 
 	private Vector2 _prevGlobal;
 	private Vector2 _currGlobal;
