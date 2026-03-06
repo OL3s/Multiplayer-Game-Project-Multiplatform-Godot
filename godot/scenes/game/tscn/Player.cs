@@ -7,7 +7,7 @@ public partial class Player : CharacterBody2D
 	private InputService _input;
 
 	public override void _Ready()
-	{
+	{ds
 		_input = GetNode<InputService>("/root/InputService");
 	}
 
@@ -22,7 +22,7 @@ public partial class Player : CharacterBody2D
 	{
 		if (Input.IsKeyPressed(Key.Space))
 		{
-			EntityFactory.Instance?.SpawnBullet(new Vector2(1, 0), speed: 1500f, maxDistance: 2000f);
+			EntityFactory.Instance?.SpawnBullet(new Vector2(1, 0), parent: this, speed: 1500f, maxDistance: 2000f);
 		}
 	}
 

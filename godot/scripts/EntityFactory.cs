@@ -22,33 +22,50 @@ public partial class EntityFactory : Node
 		GD.Print("EntityFactory ready and instance set.");
 	}
 
-	public T Spawn<T>(string path, Node2D? position = null, Node? parent = null) where T : Node2D
+	public T Spawn<T>(string path, Vector2? position = null, Node? parent = null) where T : Node2D
 	{
-		var scene = GD.Load<PackedScene>(path);
-		var obj = scene.Instantiate<T>();
 
-		parent ??= GetTree().CurrentScene;
+		if (!ResourceLoader.Exists(path))
+		{
+			GD.PrintErr($"Failed to spawn {typeof(T).Name}: Resource not found at path '{path}'");
+			return null!;
+		}
+
+		var scene = GD.Load<PackedScene>(path);
+		if (scene is null)
+		{
+			GD.PrintErr($"Failed to spawn {typeof(T).Name}: Resource at path '{path}' is not a PackedScene");
+			return null!;
+		}
+
+		var obj = scene.Instantiate<T>();
+		if (obj is null)
+		{
+			GD.PrintErr($"Failed to spawn {typeof(T).Name}: Could not instantiate scene at path '{path}'");
+			return null!;
+		}
+
+		parent ??= GetTree().Root;
 		parent.AddChild(obj);
 
 		if (position != null)
-			obj.GlobalPosition = position.GlobalPosition;
+			obj.GlobalPosition = position.Value;
 
-		GD.Print($"Spawned {typeof(T).Name} from {path} at position {obj.GlobalPosition}");
 		return obj;
 	}
 
-	public Bullet SpawnBullet(Vector2 direction, float? speed = null, float? maxDistance = null)
+	public Bullet SpawnBullet(Vector2 direction, Node? parent = null, float? speed = null, float? maxDistance = null)
 	{
-		var bullet = Spawn<Bullet>("res://scenes/game/tscn/Bullet.tscn");
+		var bullet = Spawn<Bullet>("res://scenes/game/tscn/bullet_2d.tscn", parent: parent);
 		if (speed.HasValue)         bullet.Speed = speed.Value;
 		if (maxDistance.HasValue)   bullet.MaxDistance = maxDistance.Value;
 									bullet.Direction = direction;
 		return bullet;
 	}
 
-	public Player SpawnPlayer(Vector2 position)
+	public Player SpawnPlayer(Vector2 position, Node? parent = null)
 	{
-		var player = Spawn<Player>("res://scenes/game/tscn/Player.tscn");
+		var player = Spawn<Player>("res://scenes/game/tscn/Player.tscn", parent: parent);
 		player.GlobalPosition = position;
 		return player;
 	}
