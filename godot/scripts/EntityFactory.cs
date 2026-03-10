@@ -1,5 +1,6 @@
 #nullable enable
 using Godot;
+using Combat;
 using System;
 
 /// <summary>
@@ -59,7 +60,10 @@ public partial class EntityFactory : Node
 		CharacterBody2D? shooter = null, 
 		Vector2? position = null, 
 		float? speed = null, 
-		float? maxDistance = null)
+		float? maxDistance = null,
+		float? damageFalloffStart = null,
+		DamageApply? damageApply = null,
+		float? penetration = null)
 	{
 		if (position == null && shooter == null)
 		{
@@ -74,11 +78,14 @@ public partial class EntityFactory : Node
 		}
 
 		var bullet = Spawn<Bullet>("res://scenes/game/tscn/bullet_2d.tscn");
-		if (speed.HasValue)         bullet.Speed = speed.Value;
-		if (maxDistance.HasValue)   bullet.MaxDistance = maxDistance.Value;
-									bullet.Direction = direction;
-									bullet.OwnerNode = shooter;
-									bullet.GlobalPosition = position ?? shooter?.GlobalPosition ?? Vector2.Zero;
+		if (speed.HasValue)         		bullet.Speed = speed.Value;
+		if (maxDistance.HasValue)   		bullet.MaxDistance = maxDistance.Value;
+		if (damageFalloffStart.HasValue) 	bullet.DamageFalloffStart = damageFalloffStart.Value;
+		if (damageApply is not null)        bullet.Damage = damageApply;
+		if (penetration.HasValue)   		bullet.Penetration = penetration.Value;
+											bullet.Direction = direction;
+											bullet.OwnerNode = shooter;
+											bullet.GlobalPosition = position ?? shooter?.GlobalPosition ?? Vector2.Zero;
 		return bullet;
 	}
 

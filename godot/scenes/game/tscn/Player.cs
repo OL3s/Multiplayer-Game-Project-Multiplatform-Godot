@@ -7,6 +7,7 @@ public partial class Player : CharacterBody2D
 	[Export] public float DefaultSpeed = 250f;
 	private InputService _input;
 	public CombatContainer CombatContainer = new CombatContainer();
+	public bool IsShooting = false;
 
 	public override void _Ready()
 	{
@@ -29,9 +30,13 @@ public partial class Player : CharacterBody2D
 
 	public override void _Process(double delta)
 	{
-		if (Input.IsKeyPressed(Key.Space))
+		if (Input.IsKeyPressed(Key.Space) && !IsShooting)
 		{
-			EntityFactory.Instance?.SpawnBullet(Velocity.Normalized(), shooter: this, speed: 1500f, maxDistance: 2000f);
+			IsShooting = true;
+			EntityFactory.Instance?.SpawnBullet(Velocity.Normalized().IsZeroApprox() ? Vector2.Right : Velocity.Normalized(), shooter: this);
+		} else if (!Input.IsKeyPressed(Key.Space) && IsShooting)
+		{
+			IsShooting = false;
 		}
 	}
 

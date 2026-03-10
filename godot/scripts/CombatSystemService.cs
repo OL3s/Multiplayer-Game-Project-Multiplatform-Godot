@@ -53,47 +53,46 @@ namespace Combat {
 		/// </summary>
 		public bool IsEmpty() => Count == 0 || Values.All(v => v == 0);
 
-		// ---------- OPERATORS ----------
-		public static DamageContainer operator +(DamageContainer left, DamageContainer right) {
+		// ---------- SHARED HELPERS ----------
+		// Intentionally no operator overloads on the abstract base.
+		// Operators live on concrete types so their return types are correct.
+		protected static Dictionary<DamageType, int> AddDict(DamageContainer left, DamageContainer right) {
 			if (left == null) throw new ArgumentNullException(nameof(left));
 			if (right == null) throw new ArgumentNullException(nameof(right));
 
 			var result = new Dictionary<DamageType, int>(left);
 			foreach (var kvp in right) {
-				result[kvp.Key] = result.GetValueOrDefault(kvp.Key, 0) + kvp.Value;
+				result[kvp.Key] = (result.TryGetValue(kvp.Key, out var existing) ? existing : 0) + kvp.Value;
 			}
-			return new DamageApply(result);
-		}
-		public static DamageContainer operator -(DamageContainer left, DamageContainer right) {
-			if (left == null) throw new ArgumentNullException(nameof(left));
-			if (right == null) throw new ArgumentNullException(nameof(right));
-			return left + (right * -1);
+			return result;
 		}
 
-		public static DamageContainer operator *(DamageContainer damage, float multiplier) {
+		protected static Dictionary<DamageType, int> SubtractDict(DamageContainer left, DamageContainer right) {
+			if (left == null) throw new ArgumentNullException(nameof(left));
+			if (right == null) throw new ArgumentNullException(nameof(right));
+
+			var result = new Dictionary<DamageType, int>(left);
+			foreach (var kvp in right) {
+				result[kvp.Key] = (result.TryGetValue(kvp.Key, out var existing) ? existing : 0) - kvp.Value;
+			}
+			return result;
+		}
+
+		protected static Dictionary<DamageType, int> ScaleDict(DamageContainer damage, float multiplier) {
 			if (damage == null) throw new ArgumentNullException(nameof(damage));
-			var result = new Dictionary<DamageType, int>();
+
+			var result = new Dictionary<DamageType, int>(damage.Count);
 			foreach (var kvp in damage) {
 				result[kvp.Key] = (int)(kvp.Value * multiplier);
 			}
-			return new DamageApply(result);
+			return result;
 		}
 
-		public static DamageContainer operator *(float multiplier, DamageContainer damage) => damage * multiplier;
-		public static DamageContainer operator *(DamageContainer damage, int multiplier) => damage * (float)multiplier;
-		public static DamageContainer operator *(int multiplier, DamageContainer damage) => damage * multiplier;
-
-		public static DamageContainer operator /(DamageContainer damage, float divisor) {
+		protected static Dictionary<DamageType, int> DivideDict(DamageContainer damage, float divisor) {
 			if (damage == null) throw new ArgumentNullException(nameof(damage));
 			if (divisor == 0) throw new DivideByZeroException();
-			var result = new Dictionary<DamageType, int>();
-			foreach (var kvp in damage) {
-				result[kvp.Key] = (int)(kvp.Value / divisor);
-			}
-			return new DamageApply(result);
+			return ScaleDict(damage, 1f / divisor);
 		}
-		public static DamageContainer operator /(DamageContainer damage, int divisor) => damage / (float)divisor;
-
 	}
 
 
@@ -101,12 +100,62 @@ namespace Combat {
 	/// Raw damage numbers to apply. Before armor mitigation.
 	/// </summary>
 	public class DamageApply : DamageContainer {
-		public DamageApply() : base() { }
-		public DamageApply(IDictionary<DamageType, int> dict) : base(dict) { }
-		public DamageApply(DamageType type, int value) : base(type, value) { }
-		public DamageApply(int? fire = null, int? poison = null, int? pierce = null, int? crush = null, int? explosive = null)
-			: base(fire, poison, pierce, crush, explosive) { }
+		public int TeamId { get; set; } // optional team ID for friend logic
 
+		private static Dictionary<DamageType, int> BuildDict(
+			int? fire,
+			int? poison,
+			int? pierce,
+			int? crush,
+			int? explosive
+		) {
+			var dict = new Dictionary<DamageType, int>();
+			if (fire.HasValue) dict[DamageType.Fire] = fire.Value;
+			if (poison.HasValue) dict[DamageType.Poison] = poison.Value;
+			if (pierce.HasValue) dict[DamageType.Pierce] = pierce.Value;
+			if (crush.HasValue) dict[DamageType.Crush] = crush.Value;
+			if (explosive.HasValue) dict[DamageType.Explosive] = explosive.Value;
+			return dict;
+		}
+
+		// Canonical ctor: TeamId is assigned in exactly one place.
+		public DamageApply(IDictionary<DamageType, int> dict, int teamId = 0) : base(dict) {
+			TeamId = teamId;
+		}
+
+		public DamageApply(DamageType type, int value, int teamId = 0)
+			: this(new Dictionary<DamageType, int> { [type] = value }, teamId) { }
+
+		// Convenience for named args: `new DamageApply(pierce: 50)` and `new DamageApply(teamId: 2, pierce: 50)`.
+		public DamageApply(
+			int teamId = 0,
+			int? fire = null,
+			int? poison = null,
+			int? pierce = null,
+			int? crush = null,
+			int? explosive = null
+		) : this(BuildDict(fire, poison, pierce, crush, explosive), teamId) { }
+
+		// ---------- OPERATORS (DamageApply) ----------
+		public static DamageApply operator +(DamageApply left, DamageApply right)
+			=> new DamageApply(AddDict(left, right), left.TeamId);
+
+		public static DamageApply operator -(DamageApply left, DamageApply right)
+			=> new DamageApply(SubtractDict(left, right), left.TeamId);
+
+		public static DamageApply operator *(DamageApply damage, float multiplier)
+			=> new DamageApply(ScaleDict(damage, multiplier), damage.TeamId);
+
+		public static DamageApply operator *(float multiplier, DamageApply damage) => damage * multiplier;
+		public static DamageApply operator *(DamageApply damage, int multiplier) => damage * (float)multiplier;
+		public static DamageApply operator *(int multiplier, DamageApply damage) => damage * multiplier;
+
+		public static DamageApply operator /(DamageApply damage, float divisor)
+			=> new DamageApply(DivideDict(damage, divisor), damage.TeamId);
+
+		public static DamageApply operator /(DamageApply damage, int divisor) => damage / (float)divisor;
+
+		// ---------- METHODS ----------
 		public (bool isDead, int damageTaken) ApplyTo(CombatContainer target) {
 			if (target == null) throw new ArgumentNullException(nameof(target));
 			return target.ApplyDamage(this);
@@ -158,6 +207,21 @@ namespace Combat {
 				TryAdd(type, baseValue); // only adds if missing
 			}
 		}
+
+		// ---------- OPERATORS (DamageArmor) ----------
+		public static DamageArmor operator +(DamageArmor left, DamageArmor right)
+			=> new DamageArmor(AddDict(left, right), baseValue: 0);
+
+		public static DamageArmor operator -(DamageArmor left, DamageArmor right)
+			=> new DamageArmor(SubtractDict(left, right), baseValue: 0);
+
+		public static DamageArmor operator *(DamageArmor armor, float multiplier)
+			=> new DamageArmor(ScaleDict(armor, multiplier), baseValue: 0);
+
+		public static DamageArmor operator *(float multiplier, DamageArmor armor) => armor * multiplier;
+
+		public static DamageArmor operator /(DamageArmor armor, float divisor)
+			=> new DamageArmor(DivideDict(armor, divisor), baseValue: 0);
 	}
 
 	public static class DamageCalculator {
@@ -189,13 +253,16 @@ namespace Combat {
 	public class CombatContainer {
 		public int Health { get; set; }
 		public DamageArmor Armor { get; set; }
-
-		public CombatContainer(int health, DamageArmor armor) {
+		public float PenetrationCost { get; set; } // how much penetration is removed when hit
+		public int TeamId { get; set; } // optional team ID for friend/foe logic
+		public CombatContainer(int health, DamageArmor armor, int penetrationCost, int teamId) {
 			Health = health;
 			Armor = armor ?? new DamageArmor();
+			PenetrationCost = penetrationCost;
+			TeamId = teamId;
 		}
 
-		public CombatContainer() : this(100, new DamageArmor()) { }
+		public CombatContainer() : this(100, new DamageArmor(), 100, 0) { }
 
 		public (bool isDead, int damageTaken) ApplyDamage(DamageApply damage) {
 			if (damage == null) throw new ArgumentNullException(nameof(damage));

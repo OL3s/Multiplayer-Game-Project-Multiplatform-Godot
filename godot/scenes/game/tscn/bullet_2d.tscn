@@ -2,6 +2,5 @@
 
 [ext_resource type="Script" uid="uid://dbf4b4ehpc385" path="res://scenes/game/tscn/Bullet.cs" id="1_c8h22"]
 
-[node name="Node2D" type="Node2D" unique_id=56536133]
+[node name="Bullet2D" type="Node2D" unique_id=56536133]
 script = ExtResource("1_c8h22")
-LineColor = Color(1, 1, 0, 1)

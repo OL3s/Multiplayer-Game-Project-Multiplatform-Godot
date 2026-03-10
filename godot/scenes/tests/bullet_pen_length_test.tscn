@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://cdssnjdqlku72"]
+
+[ext_resource type="PackedScene" uid="uid://diosa3cktl0m7" path="res://scenes/game/tscn/bullet_2d.tscn" id="1_8mnch"]
+
+[node name="Main" type="Node2D" unique_id=1136602184]
+
+[node name="Bullet2D" parent="." unique_id=56536133 instance=ExtResource("1_8mnch")]
+position = Vector2(-410, 345)

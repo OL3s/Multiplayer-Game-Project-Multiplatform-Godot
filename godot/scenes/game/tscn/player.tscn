@@ -3,6 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://bdku30d1il5wb" path="res://sprites/game/sp-player.png" id="1_4nle4"]
 [ext_resource type="Script" uid="uid://db3pro6rd4pxd" path="res://scenes/game/tscn/Player.cs" id="1_tr5b8"]
 [ext_resource type="Script" uid="uid://by18gjxoaq0gc" path="res://scenes/game/tscn/PlayerSpriteAnimate.cs" id="3_d8arj"]
+[ext_resource type="PackedScene" uid="uid://c1ud55cdmlla4" path="res://scenes/game/tscn/combatNode.tscn" id="4_ld6ef"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_dd427"]
 radius = 4.0
@@ -21,4 +22,4 @@ script = ExtResource("3_d8arj")
 position = Vector2(0, 5)
 shape = SubResource("CircleShape2D_dd427")
 
-[node name="Combat" type="Node" parent="." unique_id=1901485680]
+[node name="CombatNode" parent="." unique_id=1624603555 instance=ExtResource("4_ld6ef")]
