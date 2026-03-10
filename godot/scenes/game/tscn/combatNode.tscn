@@ -2,5 +2,5 @@
 
 [ext_resource type="Script" uid="uid://b7f6b6cvs3mt5" path="res://scenes/game/tscn/CombatNode.cs" id="1_esh3t"]
 
-[node name="CombatNode" type="Node" unique_id=1624603555]
+[node name="CombatNode" type="Node2D" unique_id=928297900]
 script = ExtResource("1_esh3t")

@@ -21,7 +21,7 @@ public partial class Bullet : Node2D
 	[Export] public uint CollisionMask = (1u << 0) | (1u << 1);
 	[Export] public bool CollideWithBodies = true;
 	[Export] public bool CollideWithAreas = true;
-	public DamageApply Damage = new DamageApply();
+	public DamageApply Damage = new DamageApply(pierce: 50);
 	[Export] public float Penetration = 100f; // how much penetration this bullet has left
 	public Vector2 Direction = Vector2.Right;
 	public CollisionObject2D? OwnerNode;
@@ -104,14 +104,14 @@ public partial class Bullet : Node2D
 		// ====================================
 
 		// Calculate damage with falloff and penetration
-		var container = hitNode.Container;
+		CombatContainer container = hitNode.Container;
 
 		float falloffMultiplier = CalculateDamageFalloff();
 		float penetrationMultiplier = CalculatePenetrationPercent();
 		Penetration = Math.Max(0, Penetration - container.PenetrationCost); // reduce penetration by target's penetration cost
 
 		DamageApply scaledDamage = Damage * falloffMultiplier * penetrationMultiplier;
-		(bool isDead, int damageTaken) = container.ApplyDamage(scaledDamage);
+		(bool isDead, int damageTaken) = hitNode.ApplyDamage(scaledDamage);
 		_alreadyHit.Add(hitObject); // mark this object as hit to prevent multiple hits in one shot
 		GD.Print($"Bullet hit {hitObject.Name} with damage: {damageTaken} (falloff: {falloffMultiplier:F2}, penetration: {penetrationMultiplier:F2})");
 

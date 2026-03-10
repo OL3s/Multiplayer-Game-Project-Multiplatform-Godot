@@ -18,3 +18,4 @@ shape = SubResource("CircleShape2D_v3fux")
 metadata/_edit_lock_ = true
 
 [node name="CombatNode" parent="." unique_id=1624603555 instance=ExtResource("2_v3fux")]
+Health = 40
