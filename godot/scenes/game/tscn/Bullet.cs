@@ -34,9 +34,8 @@ public partial class Bullet : Node2D
 
 	public override void _PhysicsProcess(double delta)
 	{
-		float dt = (float)delta;
-
 		_prevGlobal = GlobalPosition;
+		throw new NotImplementedException("Bullet movement and collision detection not implemented yet.");
 	}
 
 	public override void _Draw()
