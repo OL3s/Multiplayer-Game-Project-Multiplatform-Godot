@@ -1,8 +1,16 @@
 [gd_scene format=3 uid="uid://cdssnjdqlku72"]
 
 [ext_resource type="PackedScene" uid="uid://diosa3cktl0m7" path="res://scenes/game/tscn/bullet_2d.tscn" id="1_8mnch"]
+[ext_resource type="PackedScene" uid="uid://c6kalbmed1aoq" path="res://scenes/game/tscn/prop.tscn" id="2_fgf2e"]
 
 [node name="Main" type="Node2D" unique_id=1136602184]
 
 [node name="Bullet2D" parent="." unique_id=56536133 instance=ExtResource("1_8mnch")]
-position = Vector2(-410, 345)
+position = Vector2(-410, 363)
+Penetration = 130.0
+
+[node name="Prop" parent="." unique_id=929912016 instance=ExtResource("2_fgf2e")]
+position = Vector2(153, 374)
+
+[node name="Prop2" parent="." unique_id=737215002 instance=ExtResource("2_fgf2e")]
+position = Vector2(862, 372)

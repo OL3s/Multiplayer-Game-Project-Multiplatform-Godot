@@ -22,7 +22,7 @@ public partial class Bullet : Node2D
 	[Export] public bool CollideWithBodies = true;
 	[Export] public bool CollideWithAreas = true;
 	public DamageApply Damage = new DamageApply();
-	public float Penetration = 100f; // how much penetration this bullet has left
+	[Export] public float Penetration = 100f; // how much penetration this bullet has left
 	public Vector2 Direction = Vector2.Right;
 	public CollisionObject2D? OwnerNode;
 	private HashSet<CollisionObject2D> _alreadyHit = new HashSet<CollisionObject2D>();
@@ -52,12 +52,6 @@ public partial class Bullet : Node2D
 			CollideWithAreas = CollideWithAreas
 		};
 		var results = space.IntersectRay(query);
-
-		// Delete if exceeded max distance
-		if (_distanceTravelled >= MaxDistance) {
-			QueueFree();
-			return;
-		}
 		
 		// Process collision (Godot 4: IntersectRay returns a Dictionary for the first hit)
 		if (results.Count > 0
@@ -67,6 +61,12 @@ public partial class Bullet : Node2D
 			if (colliderObj is CollisionObject2D hitObject) {
 				OnHit(hitObject);
 			}
+		}
+
+		// Check if bullet should be destroyed
+		if (IsPenetrationDepleted() || IsDistanceDepleted()) {
+			QueueFree();
+			return;
 		}
 
 		// draw event + update pos
@@ -139,6 +139,14 @@ public partial class Bullet : Node2D
 		// Penetration is treated as a 0..100 value.
 		// Convert to damage multiplier (0..1).
 		return Math.Clamp(Penetration / 100f, 0f, 1f);
+	}
+
+	private bool IsPenetrationDepleted() {
+		return Penetration <= 0;
+	}
+
+	private bool IsDistanceDepleted() {
+		return _distanceTravelled >= MaxDistance;
 	}
 
 }
