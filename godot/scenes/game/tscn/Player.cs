@@ -1,10 +1,12 @@
 using Godot;
 using System;
+using Combat;
 
 public partial class Player : CharacterBody2D
 {
 	[Export] public float DefaultSpeed = 250f;
 	private InputService _input;
+	public CombatContainer CombatContainer = new CombatContainer();
 
 	public override void _Ready()
 	{
@@ -17,7 +19,7 @@ public partial class Player : CharacterBody2D
 		
 		// --- Speed multiplyers ---
 		float speedMultiplyer = 1;
-		speedMultiplyer *= (_currentInput.IsAiming ? .5f : 1f);
+		speedMultiplyer *= _currentInput.IsAiming ? .5f : 1f;
 		// -------------------------
 		
 		Vector2 movement = _currentInput.MovementVector;

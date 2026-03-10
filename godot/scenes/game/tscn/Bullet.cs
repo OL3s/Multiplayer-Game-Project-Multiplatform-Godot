@@ -37,43 +37,6 @@ public partial class Bullet : Node2D
 		float dt = (float)delta;
 
 		_prevGlobal = GlobalPosition;
-
-		Vector2 from = GlobalPosition;
-		Vector2 motion = Direction * Speed * dt;
-		Vector2 to = from + motion;
-
-		var query = PhysicsRayQueryParameters2D.Create(from, to, CollisionMask);
-		query.CollideWithBodies = CollideWithBodies;
-		query.CollideWithAreas = CollideWithAreas;
-
-		if (OwnerNode is CollisionObject2D owner)
-			query.Exclude = new Godot.Collections.Array<Rid> { owner.GetRid() };
-
-		var result = GetWorld2D().DirectSpaceState.IntersectRay(query);
-
-		if (result.Count > 0)
-		{
-			Vector2 hitPos = (Vector2)result["position"];
-			_currGlobal = hitPos;
-			GlobalPosition = hitPos;
-
-			if (result["collider"].AsGodotObject() is CollisionObject2D hitObject)
-				OnHit(hitObject, hitPos);
-
-			QueueRedraw();
-			QueueFree();
-			return;
-		}
-
-		GlobalPosition = to;
-		_currGlobal = GlobalPosition;
-
-		_travelled = _startGlobal.DistanceTo(GlobalPosition);
-
-		QueueRedraw();
-
-		if (_travelled >= MaxDistance)
-			QueueFree();
 	}
 
 	public override void _Draw()

@@ -20,3 +20,5 @@ script = ExtResource("3_d8arj")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2065978320]
 position = Vector2(0, 5)
 shape = SubResource("CircleShape2D_dd427")
+
+[node name="Combat" type="Node" parent="." unique_id=1901485680]
