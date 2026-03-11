@@ -124,14 +124,9 @@ public partial class Bullet : Node2D
 		Penetration = Math.Max(0, Penetration - container.PenetrationCost); // reduce penetration by target's penetration cost
 
 		DamageApply scaledDamage = Damage * falloffMultiplier * penetrationMultiplier;
-		(bool isDead, int damageTaken) = hitNode.ApplyDamage(scaledDamage);
+		hitNode.ApplyDamage(scaledDamage);
 		_alreadyHit.Add(hitObject); // mark this object as hit to prevent multiple hits in one shot
-		GD.Print($"Bullet hit {hitObject.Name} with damage: {damageTaken} (falloff: {falloffMultiplier:F2}, penetration: {penetrationMultiplier:F2})");
-
-		if (isDead) {
-			GD.Print($"{hitObject.Name} was killed by the bullet.");
-			hitNode.QueueFree(); // For simplicity, just free the hit node if it's dead.
-		}
+		GD.Print($"Bullet hit {hitObject.Name} with damage: {scaledDamage} (falloff: {falloffMultiplier:F2}, penetration: {penetrationMultiplier:F2})");
 	}
 
 	private float CalculateDamageFalloff() {

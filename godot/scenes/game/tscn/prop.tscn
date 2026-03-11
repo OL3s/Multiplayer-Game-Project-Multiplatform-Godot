@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://c6kalbmed1aoq"]
 
 [ext_resource type="Texture2D" uid="uid://dqhmjh3b5djg4" path="res://sprites/icons/sp-network-server.png" id="1_5vtde"]
+[ext_resource type="Script" uid="uid://cdlj62pc2qc2n" path="res://scenes/game/tscn/StaticSpriteAnimate.cs" id="2_qypop"]
 [ext_resource type="PackedScene" uid="uid://c1ud55cdmlla4" path="res://scenes/game/tscn/combatNode.tscn" id="2_v3fux"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_v3fux"]
@@ -12,10 +13,13 @@ radius = 17.0
 position = Vector2(0, -21)
 scale = Vector2(2, 2)
 texture = ExtResource("1_5vtde")
+script = ExtResource("2_qypop")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1838953182]
 shape = SubResource("CircleShape2D_v3fux")
 metadata/_edit_lock_ = true
 
-[node name="CombatNode" parent="." unique_id=1624603555 instance=ExtResource("2_v3fux")]
+[node name="CombatNode" parent="." unique_id=1624603555 node_paths=PackedStringArray("ParentObject", "StaticAnimateSprite") instance=ExtResource("2_v3fux")]
+ParentObject = NodePath("..")
+StaticAnimateSprite = NodePath("../Sprite2D")
 Health = 40

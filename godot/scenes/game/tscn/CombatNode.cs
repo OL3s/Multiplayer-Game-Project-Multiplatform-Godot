@@ -1,10 +1,14 @@
 using Godot;
 using System;
 using Combat;
-using System.Collections;
+using System.Linq;
 
 public partial class CombatNode : Node2D
 {
+
+	[Export] public CollisionObject2D ParentObject;
+	[Export] public StaticSpriteAnimate StaticAnimateSprite;
+	private PlayerSpriteAnimate _playerAnimateSprite;
 	[Export] public bool DebugDraw = false;
 	[Export] public int Health = 100;
 	[Export] public int TeamId = 0;
@@ -21,6 +25,22 @@ public partial class CombatNode : Node2D
 	public CombatContainer Container { get; private set; }
 	public override void _Ready()
 	{
+		if (ParentObject == null)
+			throw new Exception("CombatNode requires a reference to its parent object for death handling. Please set the ParentObject property in the inspector.");
+
+		// check if player is parent for animation
+		if (ParentObject is Player)
+		{
+			_playerAnimateSprite = ParentObject
+				.GetChildren()
+				.OfType<PlayerSpriteAnimate>()
+				.FirstOrDefault();
+
+			if (_playerAnimateSprite == null)
+				GD.PrintErr("Parent player object does not have a PlayerSpriteAnimate child node. Player animations will not work.");
+		}
+		
+
 		var armor = new DamageArmor(
 			baseValue: ArmorBase,
 			fire: ArmorFire,
@@ -56,13 +76,29 @@ public partial class CombatNode : Node2D
 
 	public (bool isDead, int damageTaken) ApplyDamage(DamageApply damage)
 	{
+
+		// Apply damage to the container and check for death
 		var (isDead, damageTaken) = Container.ApplyDamage(damage);
 		if (isDead)
-		{
-			GetParent().QueueFree(); // For simplicity, just free the parent node (which should be the character body)
-		}
+			ParentObject?.QueueFree(); // For simplicity, just free the parent node (which should be the character body)
 
 		QueueRedraw(); // Redraw to update any visual representation of health/armor/etc.
+
+		// Animate static sprite if available
+		if (StaticAnimateSprite != null)
+		{
+			var sas = StaticAnimateSprite;
+			var strength = Mathf.Clamp(damageTaken / 100f, 0, 0.8f); // Normalize damage to a 0-0.8 range for animation strength
+			sas.Scale = new Vector2(sas.Scale.X * (1 - strength), sas.Scale.Y * (1 + strength)); // stretch vertically and compress horizontally
+		}
+
+		// Animate player sprite if available
+		if (_playerAnimateSprite != null)
+		{
+			var pas = _playerAnimateSprite;
+			var strength = Mathf.Clamp(damageTaken / 100f, 0, 0.8f); // Normalize damage to a 0-0.8 range for animation strength
+			pas.Scale = new Vector2(pas.Scale.X * (1 - strength), pas.Scale.Y * (1 + strength)); // stretch vertically and compress horizontally
+		}
 
 		return (isDead, damageTaken);
 	}
