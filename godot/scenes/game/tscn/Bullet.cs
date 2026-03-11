@@ -14,6 +14,7 @@ public partial class Bullet : Node2D
 	[Export] public float DamageFalloffStart = 800f;
 	[Export] public float LineWidth = 8.0f;
 	[Export] public Color LineColor = new Color(1, 1, 0, 1); // Yellow color
+	[Export] public bool FriendlyFire = true;
 
 	// Layer 1 + Layer 2
 	// Godot layer index 1 = bit 0
@@ -31,14 +32,15 @@ public partial class Bullet : Node2D
 
 	public override void _Ready()
 	{
-		Direction = Direction.Normalized();
+		_alreadyHit.Clear();
+		if (OwnerNode != null) _alreadyHit.Add(OwnerNode); // prevent hitting self
 	}
 
 	public override void _PhysicsProcess(double delta)
 	{
 		// Initiate positions
 		Vector2 currentPos = GlobalPosition;
-		Vector2 displacement = Direction * Speed * (float)delta;
+		Vector2 displacement = Direction.Normalized() * Speed * (float)delta;
 		Vector2 nextPos = currentPos + displacement;
 		_distanceTravelled += displacement.Length();
 
@@ -86,21 +88,32 @@ public partial class Bullet : Node2D
 		var hitNode = hitObject.GetChildren().OfType<CombatNode>().FirstOrDefault(); // Check if the hit object has a CombatNode
 
 		// === Exceptions and early exits ===
+
 		// Not a combat node, ignore
 		if (hitNode == null) { 
 			GD.Print("Hit object does not have a CombatNode, ignore"); 
+			_alreadyHit.Add(hitObject); // mark as hit to prevent future hits in this shot
 			return; 
 		} 
-
-		// Hit self, ignore
-		if (hitObject == OwnerNode) {
-			GD.Print("Hit self, ignore");
-			return;
-		}
 
 		// Already hit this object, ignore
 		if (_alreadyHit.Contains(hitObject)) 
 			return;
+
+		// Hit self, ignore
+		if (hitObject == OwnerNode) {
+			GD.Print("Hit self, ignore");
+			_alreadyHit.Add(hitObject); // mark as hit to prevent future hits in this shot
+			return;
+		}
+
+		// Check for friendly fire
+		if (Damage.TeamId != 0 && !FriendlyFire && hitNode.Container.TeamId == Damage.TeamId) {
+			GD.Print($"Hit friendly target {hitObject.Name}, ignore due to team ID");
+			_alreadyHit.Add(hitObject); // mark as hit to prevent future hits in this shot
+			return;
+		}
+
 		// ====================================
 
 		// Calculate damage with falloff and penetration
@@ -116,9 +129,9 @@ public partial class Bullet : Node2D
 		GD.Print($"Bullet hit {hitObject.Name} with damage: {damageTaken} (falloff: {falloffMultiplier:F2}, penetration: {penetrationMultiplier:F2})");
 
 		if (isDead) {
-			hitObject.QueueFree(); // or some death handling logic
-			GD.Print($"Hit object {hitObject.Name} died from damage: {damageTaken}");
-		} 
+			GD.Print($"{hitObject.Name} was killed by the bullet.");
+			hitNode.QueueFree(); // For simplicity, just free the hit node if it's dead.
+		}
 	}
 
 	private float CalculateDamageFalloff() {

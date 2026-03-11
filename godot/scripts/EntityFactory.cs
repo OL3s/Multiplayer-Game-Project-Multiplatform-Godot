@@ -2,6 +2,7 @@
 using Godot;
 using Combat;
 using System;
+using System.Linq;
 
 /// <summary>
 /// Factory for spawning entities in the game. Provides methods to spawn various types of entities, such as bullets, players, props, etc.
@@ -57,6 +58,7 @@ public partial class EntityFactory : Node
 
 	public Bullet SpawnBullet(
 		Vector2 direction, 
+		int teamId = 0,
 		CharacterBody2D? shooter = null, 
 		Vector2? position = null, 
 		float? speed = null, 
@@ -78,10 +80,18 @@ public partial class EntityFactory : Node
 		}
 
 		var bullet = Spawn<Bullet>("res://scenes/game/tscn/bullet_2d.tscn");
+		int resolvedTeamId = teamId;
+		if (shooter != null)
+		{
+			var shooterCombatNode = shooter.GetChildren().OfType<CombatNode>().FirstOrDefault();
+			if (shooterCombatNode != null)
+				resolvedTeamId = shooterCombatNode.Container.TeamId;
+		}
 		if (speed.HasValue)         		bullet.Speed = speed.Value;
 		if (maxDistance.HasValue)   		bullet.MaxDistance = maxDistance.Value;
 		if (damageFalloffStart.HasValue) 	bullet.DamageFalloffStart = damageFalloffStart.Value;
 		if (damageApply is not null)        bullet.Damage = damageApply;
+											bullet.Damage.TeamId = resolvedTeamId;
 		if (penetration.HasValue)   		bullet.Penetration = penetration.Value;
 											bullet.Direction = direction;
 											bullet.OwnerNode = shooter;

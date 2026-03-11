@@ -12,7 +12,7 @@ public partial class PlayerSpriteAnimate : Sprite2D
 	[Export] public float MoveSwaySpeed = 10f;
 	[Export] public float MoveSwayAngle = 7f;
 	[Export] public float MoveBounceSpeed = 10f;
-	[Export] public float MoveBounceAmplitude = 2f;
+	[Export] public float MoveBounceAmplitude = 6f;
 	[Export] public float DefaultScale = 1f;
 
 	public override void _Ready()
