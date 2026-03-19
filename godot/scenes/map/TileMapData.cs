@@ -1,7 +1,7 @@
 using Godot;
 using Mapgen;
 
-public partial class TileMapFloor : TileMapLayer
+public partial class TileMapData : TileMapLayer
 {
 	private MapgenData data;
 	[Export] public int SourceId;
