@@ -40,6 +40,10 @@ namespace MapGeneration
 		/// <returns>A MapGeneratorData object containing the generated map.</returns>
 		public static MapGeneratorData GenerateMap(int seed, int length = 50, int padding = 1)
 		{
+			//Input exceptions
+			if (length <= 0 || padding < 0)
+				throw new ArgumentException("Length must be positive and padding cannot be negative.");
+
 			MapGeneratorData data = new();
 			Random random = new(seed);
 			Vector2I pos = Vector2I.Zero;
