@@ -268,7 +268,8 @@ namespace Combat {
 			if (damage == null) throw new ArgumentNullException(nameof(damage));
 
 			// Friendly fire check
-			bool isFriendlyFire = enableFriendlyFire && damage.TeamId != 0 && damage.TeamId == TeamId;
+			bool hitTeamate = damage.TeamId != 0 && damage.TeamId == TeamId;
+			bool isFriendlyFire = hitTeamate && !enableFriendlyFire;
 			if (isFriendlyFire) {
 				return new ApplyDamageResult(isDead: false, damageTaken: 0, isFriendlyFire: true);
 			}
@@ -278,7 +279,7 @@ namespace Combat {
 			Health = Math.Max(0, Health - finalDamage);
 			
 			// Return whether the target is dead and how much damage was taken
-			return new ApplyDamageResult(Health <= 0, finalDamage, isFriendlyFire: false);
+			return new ApplyDamageResult(Health <= 0, finalDamage, isFriendlyFire: isFriendlyFire);
 		}
 	}
 

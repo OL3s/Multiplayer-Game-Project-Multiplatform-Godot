@@ -8,9 +8,10 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_dd427"]
 radius = 4.0
 
-[node name="Player" type="CharacterBody2D" unique_id=1874589223]
+[node name="Player" type="CharacterBody2D" unique_id=1874589223 node_paths=PackedStringArray("CombatNode")]
 collision_mask = 3
 script = ExtResource("1_tr5b8")
+CombatNode = NodePath("CombatNode")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1571094277]
 scale = Vector2(4, 4)

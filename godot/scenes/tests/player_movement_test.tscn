@@ -9,9 +9,11 @@ size = Vector2(126, 126)
 
 [node name="Player" parent="." unique_id=1874589223 instance=ExtResource("1_qq6o2")]
 position = Vector2(131, 186)
+TeamId = 1
 
 [node name="Player2" parent="." unique_id=1508524750 instance=ExtResource("1_qq6o2")]
 position = Vector2(424, 189)
+TeamId = 1
 
 [node name="Player3" parent="." unique_id=1243932482 instance=ExtResource("1_qq6o2")]
 position = Vector2(223, 415)
