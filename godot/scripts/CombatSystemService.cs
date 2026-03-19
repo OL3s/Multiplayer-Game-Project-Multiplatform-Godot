@@ -156,9 +156,9 @@ namespace Combat {
 		public static DamageApply operator /(DamageApply damage, int divisor) => damage / (float)divisor;
 
 		// ---------- METHODS ----------
-		public (bool isDead, int damageTaken) ApplyTo(CombatContainer target) {
+		public ApplyDamageResult ApplyTo(CombatContainer target, bool enableFriendlyFire) {
 			if (target == null) throw new ArgumentNullException(nameof(target));
-			return target.ApplyDamage(this);
+			return target.ApplyDamage(this, enableFriendlyFire);
 		}
 	}
 
@@ -255,23 +255,46 @@ namespace Combat {
 		public DamageArmor Armor { get; set; }
 		public float PenetrationCost { get; set; } // how much penetration is removed when hit
 		public int TeamId { get; set; } // optional team ID for friend/foe logic
-		public CombatContainer(int health, DamageArmor armor, int penetrationCost, int teamId) {
+		public CombatContainer(int health = 100, DamageArmor armor = null, int penetrationCost = 100, int teamId = 0) {
 			Health = health;
 			Armor = armor ?? new DamageArmor();
 			PenetrationCost = penetrationCost;
 			TeamId = teamId;
 		}
 
-		public CombatContainer() : this(100, new DamageArmor(), 100, 0) { }
-
-		public (bool isDead, int damageTaken) ApplyDamage(DamageApply damage) {
+		public ApplyDamageResult ApplyDamage(DamageApply damage, bool enableFriendlyFire) 
+		{
+			// Damage missing exception
 			if (damage == null) throw new ArgumentNullException(nameof(damage));
-			Armor ??= new DamageArmor();
 
-			var finalDamage = DamageCalculator.CalculateDamage(damage, Armor);
+			// Friendly fire check
+			bool isFriendlyFire = enableFriendlyFire && damage.TeamId != 0 && damage.TeamId == TeamId;
+			if (isFriendlyFire) {
+				return new ApplyDamageResult(isDead: false, damageTaken: 0, isFriendlyFire: true);
+			}
 
+			// Calculate damage with armor mitigation
+			var finalDamage = DamageCalculator.CalculateDamage(damage, Armor ?? new DamageArmor());
 			Health = Math.Max(0, Health - finalDamage);
-			return (Health <= 0, finalDamage);
+			
+			// Return whether the target is dead and how much damage was taken
+			return new ApplyDamageResult(Health <= 0, finalDamage, isFriendlyFire: false);
+		}
+	}
+
+	public struct ApplyDamageResult {
+		public bool IsDead { get; }
+		public int DamageTaken { get; }
+		public bool IsFriendlyFire { get; }
+
+		public ApplyDamageResult(bool isDead, int damageTaken, bool isFriendlyFire) {
+			IsDead = isDead;
+			DamageTaken = damageTaken;
+			IsFriendlyFire = isFriendlyFire;
+		}
+
+		public override string ToString() {
+			return $"ApplyDamageResult(IsDead={IsDead}, DamageTaken={DamageTaken}, IsFriendlyFire={IsFriendlyFire})";
 		}
 	}
 }

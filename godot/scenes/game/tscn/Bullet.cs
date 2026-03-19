@@ -121,12 +121,15 @@ public partial class Bullet : Node2D
 
 		float falloffMultiplier = CalculateDamageFalloff();
 		float penetrationMultiplier = CalculatePenetrationPercent();
+		float PenetrationOld = Penetration; // store old penetration for logging
+		int HealthBefore = container.Health; // store health before for logging
+
 		Penetration = Math.Max(0, Penetration - container.PenetrationCost); // reduce penetration by target's penetration cost
 
 		DamageApply scaledDamage = Damage * falloffMultiplier * penetrationMultiplier;
-		hitNode.ApplyDamage(scaledDamage);
+		var result = hitNode.ApplyDamage(scaledDamage, enableFriendlyFire: FriendlyFire);
 		_alreadyHit.Add(hitObject); // mark this object as hit to prevent multiple hits in one shot
-		GD.Print($"Bullet hit {hitObject.Name} with damage: {scaledDamage} (falloff: {falloffMultiplier:F2}, penetration: {penetrationMultiplier:F2})");
+		GD.Print($"Bullet hit:\n  " + result.ToString() + $"\n  Multipliers: -> Falloff: {falloffMultiplier:F2}, Penetration: {penetrationMultiplier:F2}\n  Penetration: {PenetrationOld:F2} -> {Penetration:F2}\n  Health: {HealthBefore} -> {container.Health}");
 	}
 
 	private float CalculateDamageFalloff() {

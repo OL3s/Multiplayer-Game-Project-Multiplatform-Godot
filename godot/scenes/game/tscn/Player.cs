@@ -16,7 +16,7 @@ public partial class Player : CharacterBody2D
 
 	public override void _PhysicsProcess(double delta)
 	{
-		var _currentInput = _input.CurrentInputState;
+		var _currentInput = _input.CurrentInputState;	
 		
 		// --- Speed multiplyers ---
 		float speedMultiplyer = 1;
@@ -33,7 +33,7 @@ public partial class Player : CharacterBody2D
 		if (Input.IsKeyPressed(Key.Space) && !IsShooting)
 		{
 			IsShooting = true;
-			EntityFactory.Instance?.SpawnBullet(Velocity.Normalized().IsZeroApprox() ? Vector2.Right : Velocity.Normalized(), shooter: this);
+			EntityFactory.Instance?.SpawnBullet(Velocity.Normalized().IsZeroApprox() ? Vector2.Right : Velocity.Normalized(), friendlyFire: true, shooter: this);
 		} else if (!Input.IsKeyPressed(Key.Space) && IsShooting)
 		{
 			IsShooting = false;

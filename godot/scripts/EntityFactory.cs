@@ -58,6 +58,7 @@ public partial class EntityFactory : Node
 
 	public Bullet SpawnBullet(
 		Vector2 direction, 
+		bool friendlyFire,
 		int teamId = 0,
 		CharacterBody2D? shooter = null, 
 		Vector2? position = null, 
@@ -96,6 +97,7 @@ public partial class EntityFactory : Node
 											bullet.Direction = direction;
 											bullet.OwnerNode = shooter;
 											bullet.GlobalPosition = position ?? shooter?.GlobalPosition ?? Vector2.Zero;
+											bullet.FriendlyFire = friendlyFire;
 		return bullet;
 	}
 

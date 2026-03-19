@@ -13,7 +13,6 @@ public partial class CombatNode : Node2D
 	[Export] public int Health = 100;
 	[Export] public int TeamId = 0;
 	[Export] public int PenetrationCost = 100;
-
 	[ExportGroup("Armor")]
 	[Export] public int ArmorBase = 0;
 	[Export] public int ArmorFire = 0;
@@ -74,33 +73,32 @@ public partial class CombatNode : Node2D
 		}
 	}
 
-	public (bool isDead, int damageTaken) ApplyDamage(DamageApply damage)
+	public ApplyDamageResult ApplyDamage(DamageApply damage, bool enableFriendlyFire)
 	{
 
 		// Apply damage to the container and check for death
-		var (isDead, damageTaken) = Container.ApplyDamage(damage);
-		if (isDead)
+		var result = Container.ApplyDamage(damage, enableFriendlyFire: enableFriendlyFire);
+		if (result.IsDead)
 			ParentObject?.QueueFree(); // For simplicity, just free the parent node (which should be the character body)
 
 		QueueRedraw(); // Redraw to update any visual representation of health/armor/etc.
-
-		// Animate static sprite if available
-		if (StaticAnimateSprite != null)
-		{
-			var sas = StaticAnimateSprite;
-			var strength = Mathf.Clamp(damageTaken / 100f, 0, 0.8f); // Normalize damage to a 0-0.8 range for animation strength
-			sas.Scale = new Vector2(sas.Scale.X * (1 - strength), sas.Scale.Y * (1 + strength)); // stretch vertically and compress horizontally
-		}
 
 		// Animate player sprite if available
 		if (_playerAnimateSprite != null)
 		{
 			var pas = _playerAnimateSprite;
-			var strength = Mathf.Clamp(damageTaken / 100f, 0, 0.8f); // Normalize damage to a 0-0.8 range for animation strength
+			var strength = Mathf.Clamp(result.DamageTaken / 100f, 0, 0.8f); // Normalize damage to a 0-0.8 range for animation strength
 			pas.Scale = new Vector2(pas.Scale.X * (1 - strength), pas.Scale.Y * (1 + strength)); // stretch vertically and compress horizontally
 		}
 
-		return (isDead, damageTaken);
+		// Animate static sprite if available
+		else if (StaticAnimateSprite != null)
+		{
+			var sas = StaticAnimateSprite;
+			var strength = Mathf.Clamp(result.DamageTaken / 100f, 0, 0.8f); // Normalize damage to a 0-0.8 range for animation strength
+			sas.Scale = new Vector2(sas.Scale.X * (1 - strength), sas.Scale.Y * (1 + strength)); // stretch vertically and compress horizontally
+		}
+
+		return result;
 	}
-	
 }
