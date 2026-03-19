@@ -1,7 +1,8 @@
 using Godot;
 using System.Collections.Generic;
+using System;
 
-namespace Mapgen
+namespace MapGeneration
 {
 	/// <summary>
 	/// Generates a random map as a set of floor tiles and a path connecting them.
@@ -17,12 +18,12 @@ namespace Mapgen
 	/// call MapgenData.GenerateMap(seed).
 	/// </para>
 	/// </remarks>
-	public class MapgenData
+	public class MapGeneratorData
 	{
 		public HashSet<Vector2I> TileFloor;
 		public List<Vector2I> Path;
 
-		public MapgenData()
+		public MapGeneratorData()
 		{
 			TileFloor = new HashSet<Vector2I>();
 			Path = new List<Vector2I>();
@@ -35,16 +36,18 @@ namespace Mapgen
 		/// </summary>
 		/// <param name="seed">The seed for the random number generator.</param>
 		/// <param name="length">The desired length of the path.</param>
-		/// <returns>A MapgenData object containing the generated map.</returns>
-		public static MapgenData GenerateMap(ulong seed, int length = 50)
+		/// <param name="padding">The padding around the path.</param>
+		/// <returns>A MapGeneratorData object containing the generated map.</returns>
+		public static MapGeneratorData GenerateMap(int seed, int length = 50, int padding = 1)
 		{
-			var rng = new RandomNumberGenerator { Seed = seed };
-
-			MapgenData data = new();
-
+			MapGeneratorData data = new();
+			Random random = new(seed);
 			Vector2I pos = Vector2I.Zero;
+
 			AddTile(data, pos);
-			ApplySnake(ref pos, length, data, rng);
+			ApplySnake(ref pos, length, data, random);
+			ApplyPadding(data, padding);
+			
 			data.MoveToPositive();
 
 			GD.Print("Map Generated : " + data.GetSize());
@@ -54,19 +57,19 @@ namespace Mapgen
 		private static Vector2I ToVector2I(Vector2 v) =>
 			new(Mathf.RoundToInt(v.X), Mathf.RoundToInt(v.Y));
 
-		private static void AddTile(MapgenData data, Vector2I pos)
+		private static void AddTile(MapGeneratorData data, Vector2I pos)
 		{
 			data.TileFloor.Add(pos);
 			data.Path.Add(pos);
 		}
 
-		private static void ApplySnake(ref Vector2I pos, int length, MapgenData data, RandomNumberGenerator rng)
+		private static void ApplySnake(ref Vector2I pos, int length, MapGeneratorData data, Random random)
 		{
 			Vector2 baseDir = new(1f, 0f);
 
 			while (length > 0)
 			{
-				int step = rng.RandiRange(0, 3);
+				int step = random.Next(0, 4);
 				float angle = step * Mathf.Pi / 2f;
 				Vector2I dir = ToVector2I(baseDir.Rotated(angle));
 
@@ -79,6 +82,24 @@ namespace Mapgen
 				AddTile(data, pos);
 				length--;
 			}
+		}
+
+		private static void ApplyPadding(MapGeneratorData data, int padding)
+		{
+			var padded = new HashSet<Vector2I>();
+
+			foreach (var tile in data.TileFloor)
+			{
+				for (int dx = -padding; dx <= padding; dx++)
+				{
+					for (int dy = -padding; dy <= padding; dy++)
+					{
+						padded.Add(tile + new Vector2I(dx, dy));
+					}
+				}
+			}
+
+			data.TileFloor = padded;
 		}
 
 		public Vector2I GetTopLeft()
@@ -117,6 +138,35 @@ namespace Mapgen
 			return new Vector2I(maxX, maxY);
 		}
 
+		public static HashSet<Vector2I> GetWallTiles(HashSet<Vector2I> tileFloor)
+		{
+			var wallTiles = new HashSet<Vector2I>();
+
+			foreach (var floor in tileFloor)
+			{
+				foreach (var dir in AllDirs)
+				{
+					var neighbor = floor + dir;
+					if (!tileFloor.Contains(neighbor))
+						wallTiles.Add(neighbor);
+				}
+			}
+
+			return wallTiles;
+		}
+
+		private static readonly Vector2I[] AllDirs =
+		{
+			Vector2I.Up,
+			Vector2I.Right,
+			Vector2I.Down,
+			Vector2I.Left,
+			new Vector2I(-1, -1),
+			new Vector2I(1, -1),
+			new Vector2I(1, 1),
+			new Vector2I(-1, 1),
+		};
+
 		/// <summary>Shifts all tiles and path so the map is in positive coordinates.</summary>
 		/// <returns>Offset applied to all positions. Zero if already positive.</returns>
 		public Vector2I MoveToPositive()
@@ -148,23 +198,5 @@ namespace Mapgen
 			GetBottomRight() - GetTopLeft() + Vector2I.One;
 	}
 
-	public struct MapgridSize
-	{
-		public int Width, Height, Padding;
 
-		public MapgridSize(int width, int height)
-		{
-			Width = width;
-			Height = height;
-			Padding = 0;
-		}
-
-		public MapgridSize(MapgenData data)
-		{
-			var size = data.GetSize();
-			Width = size.X;
-			Height = size.Y;
-			Padding = 0;
-		}
-	}
 }

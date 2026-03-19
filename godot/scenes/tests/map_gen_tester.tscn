@@ -5,3 +5,4 @@
 [node name="MapGenTester" type="Node2D" unique_id=1320904665]
 
 [node name="TileMapFloor" parent="." unique_id=1976063207 instance=ExtResource("2_8dnmp")]
+Padding = 1
