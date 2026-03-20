@@ -20,7 +20,7 @@ public partial class CombatNode : Node2D
 	[Export] public int ArmorPierce = 0;
 	[Export] public int ArmorCrush = 0;
 	[Export] public int ArmorExplosive = 0;
-	[Export] public float DrawHealthbarScale = 1.0f;
+	[Export] public Vector2 DrawHealthbarScale = new Vector2(1.0f, 1.0f);
 
 	public CombatContainer Container { get; private set; }
 	public override void _Ready()
@@ -67,10 +67,10 @@ public partial class CombatNode : Node2D
 		if (DebugDraw || OS.IsDebugBuild()) {
 			float healthPercent = Container.Health / (float)Health;
 			Color healthColor = healthPercent > 0.5f ? Colors.Green : (healthPercent > 0.25f ? Colors.Yellow : Colors.Red);
-			DrawRect(new Rect2(-12.5f * DrawHealthbarScale, -20 * DrawHealthbarScale, 25f * healthPercent * DrawHealthbarScale, 2.5f * DrawHealthbarScale), healthColor);
+			DrawRect(new Rect2(-7f * DrawHealthbarScale.X, -18 * DrawHealthbarScale.Y, 14f * healthPercent * DrawHealthbarScale.X, 2.5f * DrawHealthbarScale.Y), healthColor);
 			var outlineColor = Colors.White;
 			outlineColor.A = 0.5f;
-			DrawRect(new Rect2(-12.5f * DrawHealthbarScale, -20 * DrawHealthbarScale, 25f * DrawHealthbarScale, 2.5f * DrawHealthbarScale), outlineColor, false);
+			DrawRect(new Rect2(-7f * DrawHealthbarScale.X, -18 * DrawHealthbarScale.Y, 14f * DrawHealthbarScale.X, 2.5f * DrawHealthbarScale.Y), outlineColor, false);
 		}
 	}
 
