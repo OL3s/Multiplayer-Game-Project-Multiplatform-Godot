@@ -8,21 +8,41 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_dd427"]
 radius = 4.0
 
-[node name="Player" type="CharacterBody2D" unique_id=1874589223 node_paths=PackedStringArray("CombatNode")]
-collision_mask = 3
+[sub_resource type="Gradient" id="Gradient_ld6ef"]
+offsets = PackedFloat32Array(0.4395604, 0.9175824, 1)
+colors = PackedColorArray(0.8175213, 0.8175213, 0.81752115, 1, 0.9235184, 0.9235184, 0.9235184, 1, 0, 0, 0, 1)
+metadata/_snap_count = 2
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_fkux6"]
+gradient = SubResource("Gradient_ld6ef")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.525641, 0.48290598)
+fill_to = Vector2(0.8504273, 0.15811966)
+
+[node name="Player" type="CharacterBody2D" unique_id=1874589223 node_paths=PackedStringArray("CombatNode", "Camera", "Light")]
+collision_mask = 7
 script = ExtResource("1_tr5b8")
 CombatNode = NodePath("CombatNode")
+Camera = NodePath("Camera2D")
+Light = NodePath("PointLight2D")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1571094277]
-scale = Vector2(4, 4)
 texture = ExtResource("1_4nle4")
 offset = Vector2(0, -5)
 script = ExtResource("3_d8arj")
-DefaultScale = 4.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2065978320]
-scale = Vector2(4, 4)
 shape = SubResource("CircleShape2D_dd427")
 
 [node name="CombatNode" parent="." unique_id=1624603555 node_paths=PackedStringArray("ParentObject") instance=ExtResource("4_ld6ef")]
 ParentObject = NodePath("..")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=2095678701]
+zoom = Vector2(3, 3)
+process_callback = 0
+position_smoothing_enabled = true
+
+[node name="PointLight2D" type="PointLight2D" parent="." unique_id=1200936486]
+texture = SubResource("GradientTexture2D_fkux6")

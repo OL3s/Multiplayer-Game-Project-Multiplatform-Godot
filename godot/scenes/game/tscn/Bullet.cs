@@ -8,11 +8,11 @@ using System.Linq;
 
 public partial class Bullet : Node2D
 {
-	[Export] public float Speed = 1200f;
-	[Export] public float MaxDistance = 1400f;
+	[Export] public float Speed = 400f;
+	[Export] public float MaxDistance = 500f;
 	private float _distanceTravelled = 0f;
-	[Export] public float DamageFalloffStart = 800f;
-	[Export] public float LineWidth = 8.0f;
+	[Export] public float DamageFalloffStart = 300f; // distance at which damage falloff begins
+	[Export] public float LineWidth = 2.0f;
 	[Export] public Color LineColor = new Color(1, 1, 0, 1); // Yellow color
 	[Export] public bool FriendlyFire = true;
 
@@ -32,8 +32,15 @@ public partial class Bullet : Node2D
 
 	public override void _Ready()
 	{
+		// Initialize the already hit set with the owner to prevent self-hits
 		_alreadyHit.Clear();
 		if (OwnerNode != null) _alreadyHit.Add(OwnerNode); // prevent hitting self
+
+		// add scaling properties
+		Speed *= Math.Min(Scale.X, Scale.Y);
+		LineWidth *= Math.Min(Scale.X, Scale.Y);
+		MaxDistance *= Math.Min(Scale.X, Scale.Y);
+		DamageFalloffStart *= Math.Min(Scale.X, Scale.Y);
 	}
 
 	public override void _PhysicsProcess(double delta)

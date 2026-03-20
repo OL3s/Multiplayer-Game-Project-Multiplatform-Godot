@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://d1ux525i4dqsn"]
+
+[ext_resource type="PackedScene" uid="uid://bi6y5jcabpudu" path="res://scenes/game/tscn/player.tscn" id="1_o1iq5"]
+
+[node name="LightTester" type="Node2D" unique_id=1053893325]
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=822086638]
+offset_right = 1146.0
+offset_bottom = 646.0
+
+[node name="Player" parent="." unique_id=1874589223 instance=ExtResource("1_o1iq5")]
+position = Vector2(529, 309)
+EnableCamera = true
+EnableLight = true
+
+[node name="CanvasModulate" type="CanvasModulate" parent="." unique_id=39785786]
+color = Color(0.30323282, 0.30323285, 0.30323276, 1)

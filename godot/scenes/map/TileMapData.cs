@@ -69,12 +69,12 @@ public partial class TileMapData : TileMapLayer
 		// TODO: convert MapGeneratorData to TileData.
 		foreach (var tile in data.TileFloor)
 		{
-			SetCell(tile + new Vector2I(borderPadding, borderPadding), SourceId, new Vector2I(1, 0));
+			SetCell(tile + new Vector2I(borderPadding, borderPadding), SourceId, new Vector2I(0, 0));
 		}
 
 		foreach (var wall in wallTiles)
 		{
-			SetCell(wall + new Vector2I(borderPadding, borderPadding), SourceId, new Vector2I(2, 0));
+			SetCell(wall + new Vector2I(borderPadding, borderPadding), SourceId, new Vector2I(6, 2));
 		}
 
 	}
