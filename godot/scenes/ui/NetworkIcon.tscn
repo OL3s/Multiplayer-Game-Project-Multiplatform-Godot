@@ -2,6 +2,8 @@
 
 [ext_resource type="Texture2D" uid="uid://dvmm42ldau1no" path="res://sprites/icons/sp-network-unknown.png" id="1_3holc"]
 [ext_resource type="Script" uid="uid://1i6x61ga6lq8" path="res://scenes/ui/NetworkIcon.cs" id="2_dmjxy"]
+[ext_resource type="Texture2D" uid="uid://bb6gvmsjt0e4x" path="res://sprites/icons/sp-network-client.png" id="3_rwssk"]
+[ext_resource type="Texture2D" uid="uid://dqhmjh3b5djg4" path="res://sprites/icons/sp-network-server.png" id="4_uxm77"]
 
 [node name="TextureRect" type="TextureRect" unique_id=184628440]
 anchors_preset = -1
@@ -12,3 +14,6 @@ offset_bottom = -0.1760025
 texture = ExtResource("1_3holc")
 stretch_mode = 5
 script = ExtResource("2_dmjxy")
+texClient = ExtResource("3_rwssk")
+texServer = ExtResource("4_uxm77")
+texUnknown = ExtResource("1_3holc")

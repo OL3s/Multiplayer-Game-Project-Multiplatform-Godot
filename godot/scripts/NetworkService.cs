@@ -13,6 +13,10 @@ public partial class NetworkService : Node
 	[Export] public int Port = 7777;
 	[Export] public string DefaultHost = "127.0.0.1";
 	[Export] public string DefaultPlayerName = "Player";
+	[Export] public double ClientConnectTimeoutSeconds = 10.0;
+	private bool _clientSignalsBound;
+	private bool _joinInitiated;
+	private ulong _clientJoinAttemptId;
 
 	// Session/peer state (scene-agnostic)
 	public Dictionary<long, PlayerData> Peers = new();
@@ -120,19 +124,92 @@ public partial class NetworkService : Node
 	{
 		if (IsServer) return;
 
+		var currentPeer = Multiplayer.MultiplayerPeer;
+		if (_joinInitiated || HasActiveClientPeer(currentPeer))
+		{
+			GD.PrintErr("JoinGame already initiated.");
+			return;
+		}
+
 		var h = string.IsNullOrWhiteSpace(host) ? DefaultHost : host;
 
 		var peer = new ENetMultiplayerPeer();
 		var err = peer.CreateClient(h, Port);
 		if (err != Error.Ok) { GD.PrintErr($"Client connect failed: {err}"); return; }
 
+		BindClientSignals();
+		_joinInitiated = true;
+		var attemptId = ++_clientJoinAttemptId;
 		Multiplayer.MultiplayerPeer = peer;
-
-		Multiplayer.ConnectedToServer += () => GD.Print("Connected. Waiting for server scene...");
-		Multiplayer.ConnectionFailed += () => GD.PrintErr("Connection failed");
-		Multiplayer.ServerDisconnected += () => GD.Print("Server disconnected");
+		_ = WatchClientConnectTimeout(attemptId);
 
 		GD.Print($"Client connecting to {h}:{Port}");
+	}
+
+	private bool HasActiveClientPeer(MultiplayerPeer peer)
+	{
+		if (peer == null || peer is OfflineMultiplayerPeer)
+			return false;
+
+		return peer.GetConnectionStatus() != MultiplayerPeer.ConnectionStatus.Disconnected;
+	}
+
+	private void BindClientSignals()
+	{
+		if (_clientSignalsBound)
+			return;
+
+		Multiplayer.ConnectedToServer += OnConnectedToServer;
+		Multiplayer.ConnectionFailed += OnConnectionFailed;
+		Multiplayer.ServerDisconnected += OnServerDisconnected;
+		_clientSignalsBound = true;
+	}
+
+	private async System.Threading.Tasks.Task WatchClientConnectTimeout(ulong attemptId)
+	{
+		await ToSignal(GetTree().CreateTimer(ClientConnectTimeoutSeconds), SceneTreeTimer.SignalName.Timeout);
+
+		if (attemptId != _clientJoinAttemptId || !_joinInitiated)
+			return;
+
+		var peer = Multiplayer.MultiplayerPeer;
+		if (peer == null || peer is OfflineMultiplayerPeer)
+			return;
+
+		if (peer.GetConnectionStatus() == MultiplayerPeer.ConnectionStatus.Connected)
+			return;
+
+		GD.PrintErr($"Client connect timed out after {ClientConnectTimeoutSeconds:0.##} seconds.");
+		ResetClientConnectionState();
+	}
+
+	private void OnConnectedToServer()
+	{
+		_joinInitiated = false;
+		GD.Print("Connected. Waiting for server scene...");
+	}
+
+	private void OnConnectionFailed()
+	{
+		GD.PrintErr("Connection failed");
+		ResetClientConnectionState();
+	}
+
+	private void OnServerDisconnected()
+	{
+		GD.Print("Server disconnected");
+		ResetClientConnectionState();
+	}
+
+	private void ResetClientConnectionState()
+	{
+		_clientJoinAttemptId++;
+		_joinInitiated = false;
+
+		if (Multiplayer.MultiplayerPeer is ENetMultiplayerPeer enetPeer)
+			enetPeer.Close();
+
+		Multiplayer.MultiplayerPeer = new OfflineMultiplayerPeer();
 	}
 
 	// ---------- SCENE SYNC ----------
